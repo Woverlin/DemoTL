@@ -14,75 +14,79 @@ export default class Login extends Component {
         if (this.state.pass === this.state.pass2) {
             firebaseApp.auth().createUserWithEmailAndPassword(this.state.email, this.state.pass)
                 .then(() => {
+                    firebaseApp.database().ref('/User/').push({
+                        user: this.state.email,
+                    });
+
                     Alert.alert(
                         'Thông báo',
                         'Đăng kí thành công tài khoản : ' + this.state.email,
                         [
-                          {text: 'OK', onPress: () => this.props.navigation.goBack()},
+                            { text: 'OK', onPress: () => this.props.navigation.goBack() },
                         ],
                         { cancelable: false }
-                      )
+                    )
                 })
-            .catch(function (error) {
-                var err = error.code;
-                if (err == undefined) {
-                    Alert.alert(
-                        'Thông báo',
-                        'Đăng kí thành công tài khoản : ' + this.state.email,
-                        [
-                          {text: 'OK', onPress: () => this.props.navigation.goBack()},
-                        ],
-                        { cancelable: false }
-                      )
-                }
-                 if (err == 'auth/weak-password') {
-                    Alert.alert(
-                        'Thông báo',
-                        'Mật khẩu quá ngắn',
-                        [
-                          {text: 'OK', onPress: () => console.log('cancel')},
-                        ],
-                        { cancelable: false }
-                      )
-                }
-                if (err == 'auth/invalid-email') {
-                    Alert.alert(
-                        'Thông báo',
-                        'Địa chỉ email không hợp lệ',
-                        [
-                          {text: 'OK', onPress: () => console.log('cancel')},
-                        ],
-                        { cancelable: false }
-                      )
-                }
-                if (err == 'auth/email-already-in-use') {
-                    Alert.alert(
-                        'Thông báo',
-                        'Email đã có người sử dụng',
-                        [
-                          {text: 'OK', onPress: () => console.log('cancel')},
-                        ],
-                        { cancelable: false }
-                      )
-                }
-                else{
-                    Alert.alert(
-                        'Thông báo',
-                        'Email vừa nhập không có hiệu lực' +err,
-                        [
-                          {text: 'OK', onPress: () => console.log('cancel')},
-                        ],
-                        { cancelable: false }
-                      )
-                }
-            })
+                .catch(function (error) {
+                    var err = error.code;
+                    if (err == undefined) {
+                        Alert.alert(
+                            'Thông báo',
+                            'Đăng kí thành công tài khoản : ' + this.state.email,
+                            [
+                                { text: 'OK', onPress: () => this.props.navigation.goBack() },
+                            ],
+                            { cancelable: false }
+                        )
+                    }
+                    if (err == 'auth/weak-password') {
+                        Alert.alert(
+                            'Thông báo',
+                            'Mật khẩu quá ngắn',
+                            [
+                                { text: 'OK', onPress: () => console.log('cancel') },
+                            ],
+                            { cancelable: false }
+                        )
+                    }
+                    if (err == 'auth/invalid-email') {
+                        Alert.alert(
+                            'Thông báo',
+                            'Địa chỉ email không hợp lệ',
+                            [
+                                { text: 'OK', onPress: () => console.log('cancel') },
+                            ],
+                            { cancelable: false }
+                        )
+                    }
+                    if (err == 'auth/email-already-in-use') {
+                        Alert.alert(
+                            'Thông báo',
+                            'Email đã có người sử dụng',
+                            [
+                                { text: 'OK', onPress: () => console.log('cancel') },
+                            ],
+                            { cancelable: false }
+                        )
+                    }
+                    else {
+                        Alert.alert(
+                            'Thông báo',
+                            'Email vừa nhập không có hiệu lực' + err,
+                            [
+                                { text: 'OK', onPress: () => console.log('cancel') },
+                            ],
+                            { cancelable: false }
+                        )
+                    }
+                })
         }
         else {
             Alert.alert(
                 'Thông báo3',
                 'Mật khẩu không khớp',
                 [
-                { text: 'OK', onPress: () => this.props.navigation.goBack() }
+                    { text: 'OK', onPress: () => this.props.navigation.goBack() }
                 ],
             )
         }

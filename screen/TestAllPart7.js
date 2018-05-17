@@ -168,61 +168,57 @@ export default class TestPart7 extends Component {
     }
     //console.log('data', this.state)
   }
-  getLink(pic) {
-    return new Promise((resolve, reject) => {
-      var storageRef = firebaseApp.storage().ref(pic);
-      storageRef.getDownloadURL().then((url) => {
-        resolve(url);
-      }, (error) => {
-        reject(error);
-      });
-    });
+  async getLink(pic) { // path to url
+    let url = await firebaseApp.storage().ref(pic).getDownloadURL();
+    return url
   }
-
   listenForItems() {
     const { params } = this.props.navigation.state;
-    firebaseApp.database().ref('/Part7').on('child_added', (dataSnapshot) => {
-      this.getLink(dataSnapshot.val().linkcomprehension)
-        .then((html) => {
-          let item = {
-            id: dataSnapshot.val().id,
-            answer1: dataSnapshot.val().answer1,
-            answer2: dataSnapshot.val().answer2,
-            answer3: dataSnapshot.val().answer3,
-            answer4: dataSnapshot.val().answer4,
-            answer5: dataSnapshot.val().answer5,
-            answer6: dataSnapshot.val().answer6,
-            answer7: dataSnapshot.val().answer7,
-            answer8: dataSnapshot.val().answer8,
-            answer9: dataSnapshot.val().answer9,
-            answer10: dataSnapshot.val().answer10,
-            answer11: dataSnapshot.val().answer11,
-            answer12: dataSnapshot.val().answer12,
-            answer13: dataSnapshot.val().answer13,
-            answer14: dataSnapshot.val().answer14,
-            answer15: dataSnapshot.val().answer15,
-            answer16: dataSnapshot.val().answer16,
-            answer17: dataSnapshot.val().answer17,
-            answer18: dataSnapshot.val().answer18,
-            answer19: dataSnapshot.val().answer19,
-            answer20: dataSnapshot.val().answer20,
-            question1: dataSnapshot.val().question19,
-            question2: dataSnapshot.val().question20,
-            question3: dataSnapshot.val().question21,
-            question4: dataSnapshot.val().question22,
-            question5: dataSnapshot.val().question23,
-            result1: dataSnapshot.val().result19,
-            result2: dataSnapshot.val().result20,
-            result3: dataSnapshot.val().result21,
-            result4: dataSnapshot.val().result22,
-            result5: dataSnapshot.val().result23,
-            html,
-          };
-          this.setState({
-            items: [...this.state.items, item]
+    for (let i = 1; i < 10; i++) {
+      firebaseApp.database().ref('/Part7').orderByChild('idLesson').equalTo(i).on('child_added', (dataSnapshot) => {
+        this.getLink(dataSnapshot.val().linkcomprehension)
+          .then((html) => {
+            let item = {
+              id: dataSnapshot.val().id,
+              answer1: dataSnapshot.val().answer1,
+              answer2: dataSnapshot.val().answer2,
+              answer3: dataSnapshot.val().answer3,
+              answer4: dataSnapshot.val().answer4,
+              answer5: dataSnapshot.val().answer5,
+              answer6: dataSnapshot.val().answer6,
+              answer7: dataSnapshot.val().answer7,
+              answer8: dataSnapshot.val().answer8,
+              answer9: dataSnapshot.val().answer9,
+              answer10: dataSnapshot.val().answer10,
+              answer11: dataSnapshot.val().answer11,
+              answer12: dataSnapshot.val().answer12,
+              answer13: dataSnapshot.val().answer13,
+              answer14: dataSnapshot.val().answer14,
+              answer15: dataSnapshot.val().answer15,
+              answer16: dataSnapshot.val().answer16,
+              answer17: dataSnapshot.val().answer17,
+              answer18: dataSnapshot.val().answer18,
+              answer19: dataSnapshot.val().answer19,
+              answer20: dataSnapshot.val().answer20,
+              question1: dataSnapshot.val().question19,
+              question2: dataSnapshot.val().question20,
+              question3: dataSnapshot.val().question21,
+              question4: dataSnapshot.val().question22,
+              question5: dataSnapshot.val().question23,
+              result1: dataSnapshot.val().result19,
+              result2: dataSnapshot.val().result20,
+              result3: dataSnapshot.val().result21,
+              result4: dataSnapshot.val().result22,
+              result5: dataSnapshot.val().result23,
+              html,
+            };
+            this.setState({
+              items: [...this.state.items, item]
+            });
           });
-        });
-    });
+      });
+    }
+
   }
   renderBaiHoc() {
     console.log('itemmmmmmm', this.state.items)

@@ -11,7 +11,6 @@ import {
     RefreshControl
 } from 'react-native';
 import { firebaseApp } from '../Config.js';
-const lesson = require('../Lesson.json');
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Icon1 from 'react-native-vector-icons/FontAwesome';
 export default class Home extends Component {
@@ -39,33 +38,37 @@ export default class Home extends Component {
             });
         });
     }
-    listenForItems() {
+    GetUser = async () => {
+        const value = await AsyncStorage.getItem('user');
+        const UserKey = await AsyncStorage.getItem('userKey');
+        await this.setState({
+            user: value,
+            userKey: UserKey
+        })
+        await console.log('user and key', this.state.user, this.state.userKey)
+    }
+    async listenForItems() {
+        await this.GetUser();
         let arr = [];
-        firebaseApp.database().ref('/ChuDe').orderByChild('topicmark').equalTo(true).on('child_added', (dataSnapshot) => {
+        await firebaseApp.database().ref('/User/' + this.state.userKey + '/Topic').on('child_added', (dataSnapshot) => {
             console.log('data:', dataSnapshot.val());
-            this.getPic(dataSnapshot.val().linkImg)
-                .then((pic2) => {
-                    let item = {
-                        name: dataSnapshot.val().word,
-                        stt: dataSnapshot.val().id,
-                        mean: dataSnapshot.val().mean,
-                        mark: dataSnapshot.val().topicmark,
-                        key:dataSnapshot.key,
-                        pic2,
-                    };
-                    arr.push(item);
-                    return arr
-                    //array
-                    //array.push(item) neu soluong === so luong can
-                    //return array
-                    //sdung ham then -> sap xep bo setState
-                })
-                .then(result => {
-                    result = result.sort(this.compare);
-                    this.setState({
-                        items: result
-                    })
-                });
+            let item = {
+                name: dataSnapshot.val().name,
+                stt: dataSnapshot.val().id,
+                mean: dataSnapshot.val().mean,
+                key: dataSnapshot.key,
+                pic2: dataSnapshot.val().pic
+            };
+            arr.push(item);
+            //return arr
+            //array
+            //array.push(item) neu soluong === so luong can
+            //return array
+            //sdung ham then -> sap xep bo setState
+        });
+        let result = arr.sort(this.compare);
+        this.setState({
+            items: result
         })
     }
     _onRefresh() {
@@ -79,13 +82,10 @@ export default class Home extends Component {
         }.bind(this), 1000)
     }
     delete(stt) {
-        var key=stt-1;
-        firebaseApp.database().ref('/ChuDe/' + key).update({
-            topicmark: false
-        });
+        firebaseApp.database().ref('/User/' + this.state.userKey + '/Topic/' + stt).remove();
         let temp = this.state.items.filter((x) => x.stt !== stt);
         this.setState({ items: temp });
-      }
+    }
     render() {
         const { navigate } = this.props.navigation;
         const { items } = this.state;
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     },
     trash: {
         marginRight: 10,
-      },
+    },
     lsname: {
         color: '#119f81',
         fontSize: 15,

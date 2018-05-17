@@ -226,13 +226,6 @@ const drawernav = DrawerNavigator({
     Search1: { screen: Stack_Search },
     TopicSaved1: { screen: Stack_TopicSaved },
     Support1: { screen: Stack_Support }
-    // Home: { screen: Stack_Home },
-    // Grammar: { screen: Grammar },
-    // Game: { screen: Game },
-    // VocabSave: { screen: VocabSave },
-    // Search: { screen: Search },
-    // TopicSaved: { screen: Home2 },
-
 }, {
         initialRouteName: 'Home1',
         drawerWidth: 230,
@@ -247,6 +240,6 @@ const Stack_Login = StackNavigator({
         headerMode: 'none',
         headerVisible: false,
     })
-//export default drawernav;
-export default drawernav;
+//export default ;
+export default Stack_Login;
 //AppRegistry.registerComponent('DemoTL', () => Test);

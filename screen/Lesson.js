@@ -34,27 +34,21 @@ export default class Lesson extends Component {
     //this.items = [];
 
     this.state = {
+      listVocabSave: [],
       count: 0,
       items: [],
+      user: '',
+      userKey: '',
       // star:false,
       eng: true,
       viet: false,
       colorstar: 'red'
     }
   }
-
-  getPic(pic) {
-    return new Promise((resolve, reject) => {
-      var storageRef = firebaseApp.storage().ref(pic);
-      storageRef.getDownloadURL().then((url) => {
-        console.log('url:' + url)
-        resolve(url);
-      }, (error) => {
-        reject(error);
-      });
-    });
+  async getPic(pic) {
+    let url = await firebaseApp.storage().ref(pic).getDownloadURL();
+    return url
   }
-
   playTrack(audio) {
     console.log('play run :' + audio)
     const track = new Sound(audio, null, (e) => {
@@ -91,7 +85,6 @@ export default class Lesson extends Component {
       return 1;
     return 0;
   }
-
   indexOf(giatri) {
     let temp = this.state.items
     for (var i = 0; i < temp.length; i++) {
@@ -99,67 +92,122 @@ export default class Lesson extends Component {
         return i
     }
   }
-  favorite(key, mark) {
+  GetUser = async () => {
+    const value = await AsyncStorage.getItem('user');
+    const UserKey = await AsyncStorage.getItem('userKey');
+    await this.setState({
+      user: value,
+      userKey: UserKey
+    })
+  }
+  favorite(item) {  //key.mark
     console.log('love run')
     //tao mang temp tu mang chinh
     //tim vi tri cua gia tri trong mang
     //thay doi gia tri mark cua mang phu va truyen lai vao mang chinh
     //var vitri = null
-    var vitri = this.indexOf(key)
+    var vitri = this.indexOf(item.key)
     console.log('vitri', vitri)
-    if (mark === true) {
-      firebaseApp.database().ref('/Vocab/' + key).update({
-        vocabmark: false
-      });
+    if (item.mark === true) {
+      firebaseApp.database().ref('/User/' + this.state.userKey + '/Vocab/' + item.stt).remove();
       let temp = [...this.state.items];
       temp[vitri] = { ...temp[vitri], mark: false };
       this.setState({ items: temp });
     }
-    if (mark === false) {
-      firebaseApp.database().ref('/Vocab/' + key).update({
-        vocabmark: true
+    if (item.mark === false) {
+      firebaseApp.database().ref('/User/' + this.state.userKey + '/Vocab/' + item.stt).update({
+        stt: item.stt,
+        name: item.name,
+        mean: item.mean,
+        example: item.example,
+        explainMean: item.explainMean,
+        explainExample: item.explainExample,
+        type: item.type,
+        pronounce: item.pronounce,
+        parent: item.parent,
+        mark: item.mark,
+        pic: item.pic2,
+        audio: item.audio,
       });
       let temp = [...this.state.items];
       temp[vitri] = { ...temp[vitri], mark: true };
       this.setState({ items: temp });
     }
   }
+  async GetListVocabSave() {
+    await this.GetUser()
+    await console.log('get userKey', this.state.userKey)
+    await firebaseApp.database().ref('User/' + this.state.userKey + '/Vocab').on('child_added', (dataSnapshot) => {
+      let item = {
+        stt: dataSnapshot.id,
+        name: dataSnapshot.word,
+        mean: dataSnapshot.mean,
+        example: dataSnapshot.example,
+        explainMean: dataSnapshot.explainMean,
+        explainExample: dataSnapshot.explainExample,
+        type: dataSnapshot.type,
+        pronounce: dataSnapshot.pronounce,
+        parent: dataSnapshot.parent,
+        mark: dataSnapshot.vocabmark,
+        pic: dataSnapshot.pic,
+        audio: dataSnapshot.audio,
+      };
+      this.setState({
+        listVocabSave: [...this.state.listVocabSave, item]
+      })
+    });
+    await console.log('list vocab saved', this.state.listVocabSave)
+  }
+  async GetMark(id) {   //kiem tra id cua tu vung co trong list save hay ko
+    let mark = false
+    const listVocabSave = this.state.listVocabSave
+    console.log('list saved', listVocabSave)
+    for (var i = 0; i < listVocabSave.length; i++) {
+      if (id == listVocabSave[i].key) {
+        mark = true
+        console.log('mark 108', mark)
+        return mark
+      }
+    }
+    return mark
+  }
   listenForItems() {
     let arr = []
     const { params } = this.props.navigation.state;
     firebaseApp.database().ref('/Vocab').orderByChild('parent').equalTo(params.id).on('child_added', (dataSnapshot) => {
-      console.log('napshot', dataSnapshot.val().linkImg);
-      this.getPic(dataSnapshot.val().linkImg)
-        .then((pic2) => {
-          this.getPic(dataSnapshot.val().linkAudio).then((audio) => {
-            let item = {
-              stt: dataSnapshot.val().id,
-              name: dataSnapshot.val().word,
-              key: dataSnapshot.key,
-              mean: dataSnapshot.val().mean,
-              example: dataSnapshot.val().example,
-              explainMean: dataSnapshot.val().explainMean,
-              explainExample: dataSnapshot.val().explainExample,
-              type: dataSnapshot.val().type,
-              pronounce: dataSnapshot.val().pronounce,
-              parent: dataSnapshot.val().parent,
-              mark: dataSnapshot.val().vocabmark,
-              pic2,
-              audio,
-            };
-            arr.push(item);
-            return arr
-          })
-            .then(result => {
-              console.log(result)
-              //if (result.length === 50){
-              result = result.sort(this.compare);
-              this.setState({
-                items: result
-              })
-            }
-            );
-        });
+      this.GetMark(dataSnapshot.val().id).then((mark) => {
+        this.getPic(dataSnapshot.val().linkImg)
+          .then((pic2) => {
+            this.getPic(dataSnapshot.val().linkAudio).then((audio) => {
+              let item = {
+                stt: dataSnapshot.val().id,
+                name: dataSnapshot.val().word,
+                key: dataSnapshot.key,
+                mean: dataSnapshot.val().mean,
+                example: dataSnapshot.val().example,
+                explainMean: dataSnapshot.val().explainMean,
+                explainExample: dataSnapshot.val().explainExample,
+                type: dataSnapshot.val().type,
+                pronounce: dataSnapshot.val().pronounce,
+                parent: dataSnapshot.val().parent,
+                mark,
+                pic2,
+                audio,
+              };
+              arr.push(item);
+              return arr
+            })
+              .then(result => {
+                console.log(result)
+                result = result.sort(this.compare);
+                this.setState({
+                  items: result
+                })
+              }
+              );
+          });
+      })
+
     });
   }
   renderBaiHoc(data) {
@@ -184,10 +232,10 @@ export default class Lesson extends Component {
                 <View style={{ flexDirection: 'row', justifyContent: 'center', }}>
 
                   <TouchableOpacity onPress={() => this.playTrack(views[r].audio)}>
-                    <Icon style={styles.audio}  name="volume-up" size={40}/>
+                    <Icon style={styles.audio} name="volume-up" size={40} />
                   </TouchableOpacity>
 
-                  <TouchableOpacity onPress={() => this.favorite(views[r].key, views[r].mark)}>
+                  <TouchableOpacity onPress={() => this.favorite(views[r])}>
                     <Icon style={[styles.audio]} name={views[r].mark ? 'star' : 'star-border'} size={40} />
                   </TouchableOpacity>
                 </View>
@@ -198,7 +246,7 @@ export default class Lesson extends Component {
             <View style={{ justifyContent: 'flex-end' }}>
               <TouchableOpacity style={{ paddingBottom: 5 }} onPress={this.changText.bind(this)}>
                 <IconOcticons
-                  style={styles.audio} name="sync" size={40}/>
+                  style={styles.audio} name="sync" size={40} />
               </TouchableOpacity>
             </View>
           </View>
@@ -225,8 +273,9 @@ export default class Lesson extends Component {
   _renderDotIndicator() {
     return <PagerDotIndicator pageCount={this.state.items.length} />;
   }
-  componentWillMount() {
-    this.listenForItems();
+  async componentWillMount() {
+    await this.GetListVocabSave();
+    await this.listenForItems();
   }
 }
 

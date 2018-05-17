@@ -13,7 +13,6 @@ import {
 import { firebaseApp } from '../Config.js';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Icon1 from 'react-native-vector-icons/FontAwesome';
-const lesson = require('../Lesson.json');
 import Sound from 'react-native-sound';
 import CheckAlert from "react-native-awesome-alert"
 export default class VocabSave extends Component {
@@ -24,6 +23,7 @@ export default class VocabSave extends Component {
       img: [],
       items: [],
       refreshing: false,
+
     }
   }
 
@@ -45,51 +45,50 @@ export default class VocabSave extends Component {
       return 1;
     return 0;
   }
-  listenForItems() {
+  GetUser = async () => {
+    const value = await AsyncStorage.getItem('user');
+    const UserKey = await AsyncStorage.getItem('userKey');
+    await this.setState({
+      user: value,
+      userKey: UserKey
+    })
+    await console.log('user and key', this.state.user, this.state.userKey)
+  }
+  async listenForItems() {
+    await this.GetUser();
     let arr = [];
-    firebaseApp.database().ref('/Vocab').orderByChild('vocabmark').equalTo(true).on('child_added', (dataSnapshot) => {
-      this.getPic(dataSnapshot.val().linkImg)
-        .then((pic) => {
-          this.getPic(dataSnapshot.val().linkAudio)
-            .then((audio) => {
-              let item = {
-                stt: dataSnapshot.val().id,
-                name: dataSnapshot.val().word,
-                key: dataSnapshot.key,
-                mean: dataSnapshot.val().mean,
-                example: dataSnapshot.val().example,
-                explainMean: dataSnapshot.val().explainMean,
-                explainExample: dataSnapshot.val().explainExample,
-                type: dataSnapshot.val().type,
-                pronounce: dataSnapshot.val().pronounce,
-                parent: dataSnapshot.val().parent,
-                mark: dataSnapshot.val().vocabmark,
-                pic,
-                audio,
-              };
-              arr.push(item);
-              return arr
-            })
-            .then(result => {
-              console.log('result', result)
-              result = result.sort(this.compare);
-              this.setState({
-                items: result
-              })
-              console.log('items', this.state.items)
-            });
-        })
-      })
-    }
+    await firebaseApp.database().ref('/User/' + this.state.userKey + '/Vocab').on('child_added', (dataSnapshot) => {
+      let item = {
+        stt: dataSnapshot.val().stt,
+        name: dataSnapshot.val().name,
+        key: dataSnapshot.key,
+        mean: dataSnapshot.val().mean,
+        example: dataSnapshot.val().example,
+        explainMean: dataSnapshot.val().explainMean,
+        explainExample: dataSnapshot.val().explainExample,
+        type: dataSnapshot.val().type,
+        pronounce: dataSnapshot.val().pronounce,
+        parent: dataSnapshot.val().parent,
+        pic: dataSnapshot.val().pic,
+        audio: dataSnapshot.val().audio,
+      };
+      arr.push(item);
+    })
+    let result = arr.sort(this.compare);
+    this.setState({
+      items: result
+    })
+    console.log('items', this.state.items)
+  }
   _onRefresh() {
-        this.setState({
-          refreshing: true
-        })
-    setTimeout(function() {
-          this.setState({
-            refreshing: false
-          })
-        }.bind(this), 1000)
+    this.setState({
+      refreshing: true
+    })
+    setTimeout(function () {
+      this.setState({
+        refreshing: false
+      })
+    }.bind(this), 1000)
   }
   indexOf(giatri) {
     let temp = this.state.items
@@ -99,9 +98,7 @@ export default class VocabSave extends Component {
     }
   }
   delete(key, stt) {
-    firebaseApp.database().ref('/NguPhap/' + key).update({
-      vocabmark: false
-    });
+    firebaseApp.database().ref('/User/' + this.state.userKey + '/Vocab/' + stt).remove();
     let temp = this.state.items.filter((x) => x.stt !== stt);
     this.setState({ items: temp });
   }
@@ -125,7 +122,7 @@ export default class VocabSave extends Component {
         <Text style={{ fontSize: 17, color: "red" }}> {item.pronounce}</Text>
         <Text style={{ fontSize: 19, color: "#119f81", textAlign: 'center' }}> {item.mean}</Text>
         <Text style={{ fontSize: 15, color: "#005b9f", textAlign: 'center' }}> example: {item.example}</Text>
-        <TouchableOpacity style={{paddingTop: 5 ,}} onPress={() => this.playTrack(item.audio)}>
+        <TouchableOpacity style={{ paddingTop: 5, }} onPress={() => this.playTrack(item.audio)}>
           <Icon name="volume-up" size={30} />
         </TouchableOpacity>
       </View>,

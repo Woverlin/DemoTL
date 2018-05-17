@@ -8,15 +8,53 @@ export default class Login extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            listUser: [],
             email: '',
             pass: ''
+        }
+    }
+    async GetListUserKey() {
+        firebaseApp.database().ref('/User').on('child_added', (dataSnapshot) => {
+            let user = {
+                key: dataSnapshot.key,
+                user: dataSnapshot.val().user
+            };
+            this.setState({
+                listUser: [...this.state.listUser, user]
+            })
+        })
+    }
+    async CheckLogin() {
+        const value = await AsyncStorage.getItem('user');
+        const userKey = await AsyncStorage.getItem('userKey');
+        if (!userKey) {
+            console.log('Chưa login')
+        }
+        else {
+            this.props.navigation.navigate('drawernav')
+        }
+    }
+    GetUserKeyLogin() {
+        const list = this.state.listUser
+        //console.log('list USer', list)
+        for (var i = 0; i < list.length; i++) {
+            //console.log('user :', list[i].user)
+            if (list[i].user === this.state.email) {
+                console.log('key cua user la :', i, list[i].key)
+                return list[i].key
+            }
         }
     }
     Dangnhap() {
         firebaseApp.auth().signInWithEmailAndPassword(this.state.email, this.state.pass)
             .then(() => {
+                this.saveUserKey()
+            })
+            .then(() => {
+                AsyncStorage.setItem('user', this.state.email)
                 this.props.navigation.navigate('drawernav')
             })
+
             .catch(function (error) {
                 var err = error.code;
                 Alert.alert(
@@ -28,6 +66,24 @@ export default class Login extends Component {
                     { cancelable: false }
                 )
             })
+    }
+    saveUserKey = async () => {
+        try {
+            const idUser = this.GetUserKeyLogin()
+            await AsyncStorage.setItem('userKey', idUser)
+            const UserKey1 = await AsyncStorage.getItem('userKey');
+            console.log('66-UserKey1', UserKey1)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    GetUser() {
+        const User = this.ShowUser()
+    }
+
+    async componentWillMount() {
+        await this.CheckLogin()
+        await this.GetListUserKey()
     }
     render() {
         const { navigate } = this.props.navigation;

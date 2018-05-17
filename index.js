@@ -5,7 +5,7 @@
 // AppRegistry.registerComponent('DemoTL', () => LogoScreen);
 
 import React, { Component } from 'react';
-import { View, Text,AppRegistry } from 'react-native';
+import { View, Text, AppRegistry } from 'react-native';
 import App from './App'
 import LogoScreen from './screen/LogoScreen'
 export default class index extends Component {
@@ -22,7 +22,7 @@ export default class index extends Component {
         this.timeoutHandle = setTimeout(() => {
             // Add your logic for the transition
             this.setState({ component: <App /> })
-        }, 200);
+        }, 3000);
     }
 
     componentWillUnmount() {
