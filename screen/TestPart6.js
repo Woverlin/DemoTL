@@ -41,50 +41,66 @@ export default class TestPart6 extends Component {
             da11: false,
             da12: false,
             linkHTML: '',
+            myAnswer1: null,
+            myAnswer2: null,
+            myAnswer3: null,
         }
     }
-    playTrack(audio) {
-        console.log('play run :' + audio)
-        const track = new Sound(audio, null, (e) => {
-            if (e) {
-                console.log('error loading track:', e)
-            } else {
-                track.play()
-            }
-        })
-    }
-    onPageScroll() {
-        return this.setState({
-            answer1: undefined,
-            answer2: undefined,
-            answer3: undefined,
-            answer4: undefined,
-            answer5: undefined,
-            answer6: undefined,
-            da1: false,
-            da2: false,
-            da3: false,
-            da4: false,
-            da5: false,
-            da6: false,
-            htmlenable: false,
+    // onPageScroll() {
+    //     return this.setState({
+    //         answer1: undefined,
+    //         answer2: undefined,
+    //         answer3: undefined,
+    //         answer4: undefined,
+    //         answer5: undefined,
+    //         answer6: undefined,
+    //         da1: false,
+    //         da2: false,
+    //         da3: false,
+    //         da4: false,
+    //         da5: false,
+    //         da6: false,
+    //         htmlenable: false,
 
+    //     })
+    // }
+    GetUser = async () => {
+        //const value = await AsyncStorage.getItem('user');
+        const UserKey = await AsyncStorage.getItem('userKey');
+        await this.setState({
+            userKey: UserKey
         })
     }
     answer(data) {
         this.setState({
             htmlenable: true
         })
-        console.log('linkhtml', data.html)
+
         var da1 = data.result1;
         var da2 = data.result2;
         var da3 = data.result3;
+
+        console.log('myas1,myas2,myas3', this.state.myAnswer1, this.state.myAnswer2, this.state.myAnswer3)
+        console.log('da1,da2,da3', da1, da2, da3)
         this.setState(prevState => {
             return { linkHTML: data.html }
         }, () => {
             console.log('state linkhtml' + this.state.linkHTML)
         })
-
+        const id = this.props.navigation.state.params.id
+        var percent = 0
+        if (da1 === this.state.myAnswer1) {
+            percent = percent + 33
+        }
+        if (da2 === this.state.myAnswer2) {
+            percent = percent + 33
+        }
+        if (da3 === this.state.myAnswer3) {
+            percent = percent + 34
+        }
+        firebaseApp.database().ref('/User/' + this.state.userKey + '/Process/' + id).update({
+            part6: percent
+        });
         if (da1 === data.answer1) {
             this.setState({
                 da1: true
@@ -207,87 +223,89 @@ export default class TestPart6 extends Component {
                     <View style={styles.view1}>
                         <ScrollView>
                             <View >
-                                <Text style={{fontSize:17,color:'#119f81'}}> Điền vào chỗ trống </Text>
-                                <Text style={{fontSize:15,color:'black'}}> Vị trí (16)</Text>
+                                <Text style={{ fontSize: 17, color: '#119f81' }}> Điền vào chỗ trống </Text>
+                                <Text style={{ fontSize: 15, color: 'black' }}> Vị trí (16)</Text>
                             </View>
                             <View>
-                                <RadioGroup color='#119f81'>
-
-                                    <RadioButton value={'item1'} >
+                                <RadioGroup color='#119f81'
+                                    onSelect={(index, value) => this.setState({ myAnswer1: value })}
+                                >
+                                    <RadioButton value={item.answer1} >
                                         <Text style={[this.state.da1 && styles.da]} >A.{item.answer1}</Text>
-
                                     </RadioButton>
-
-                                    <RadioButton value={'item2'}>
+                                    <RadioButton value={item.answer2}>
                                         <Text style={[this.state.da2 && styles.da]}>B.{item.answer2}</Text>
                                     </RadioButton>
-
-                                    <RadioButton value={'item3'}>
+                                    <RadioButton value={item.answer3}>
                                         <Text style={[this.state.da3 && styles.da]}>C.{item.answer3}</Text>
                                     </RadioButton>
-
-                                    <RadioButton value={'item4'}>
+                                    <RadioButton value={item.answer4}>
                                         <Text style={[this.state.da4 && styles.da]}>D.{item.answer4}</Text>
                                     </RadioButton>
                                 </RadioGroup>
                             </View>
 
                             <View >
-                                <Text style={{fontSize:15,color:'black'}}>Vị trí (17)</Text>
+                                <Text style={{ fontSize: 15, color: 'black' }}>Vị trí (17)</Text>
                             </View>
                             <View>
-                                <RadioGroup color='#119f81'>
-                                    <RadioButton value={'item1'} >
+                                <RadioGroup color='#119f81'
+                                    onSelect={(index, value) => this.setState({ myAnswer2: value })}
+                                >
+                                    <RadioButton value={item.answer5} >
                                         <Text style={[this.state.da5 && styles.da]} >A.{item.answer5}</Text>
                                     </RadioButton>
-                                    <RadioButton value={'item2'}>
+                                    <RadioButton value={item.answer6}>
                                         <Text style={[this.state.da6 && styles.da]}>B.{item.answer6}</Text>
                                     </RadioButton>
-                                    <RadioButton value={'item3'}>
+                                    <RadioButton value={item.answer7}>
                                         <Text style={[this.state.da7 && styles.da]}>C.{item.answer7}</Text>
-                                    </RadioButton>
+                                    </RadioButton >
 
-                                    <RadioButton value={'item4'}>
+                                    <RadioButton value={item.answer8}>
                                         <Text style={[this.state.da8 && styles.da]}>D.{item.answer8}</Text>
                                     </RadioButton>
                                 </RadioGroup >
-                            </View>
+                            </View >
                             <View >
-                                <Text style={{fontSize:15,color:'black'}}> Vị trí (18) </Text>
+                                <Text style={{ fontSize: 15, color: 'black' }}> Vị trí (18) </Text>
                             </View>
                             <View>
-                                <RadioGroup color='#119f81'>
-                                    <RadioButton value={'item1'} >
+                                <RadioGroup color='#119f81'
+                                    onSelect={(index, value) => this.setState({ myAnswer3: value })}
+                                >
+                                    <RadioButton value={item.answer9} >
                                         <Text style={[this.state.da9 && styles.da]} >A.{item.answer9}</Text>
                                     </RadioButton>
-                                    <RadioButton value={'item2'}>
+                                    <RadioButton value={item.answer10}>
                                         <Text style={[this.state.da10 && styles.da]}>B.{item.answer10}</Text>
                                     </RadioButton>
-                                    <RadioButton value={'item3'}>
+                                    <RadioButton value={item.answer11}>
                                         <Text style={[this.state.da11 && styles.da]}>C.{item.answer11}</Text>
                                     </RadioButton>
 
-                                    <RadioButton value={'item4'}>
+                                    <RadioButton value={item.answer12}>
                                         <Text style={[this.state.da12 && styles.da]}>D.{item.answer12}</Text>
                                     </RadioButton>
-                                </RadioGroup>
-                            </View>
-                        </ScrollView>
-                    </View>
+                                </RadioGroup >
+                            </View >
+                        </ScrollView >
+                    </View >
                     <View style={{ margin: 5, flexDirection: 'row', justifyContent: 'space-between', }}>
-                        <Text style={{ fontSize: 18, padding: 12,color:'white'  }}> Text Completetion </Text>
+                        <Text style={{ fontSize: 18, padding: 12, color: 'white' }}> Text Completetion </Text>
                         <TouchableOpacity onPress={() => this.answer(item)}>
                             <Image style={{ height: 50, width: 50, padding: 20 }}
                                 source={require('../image/icon_rs.png')} />
                         </TouchableOpacity>
                     </View>
-                </View>
-            </View>
+                </View >
+            </View >
 
         );
     }
-    componentDidMount() {
-        this.listenForItems();
+    async componentDidMount() {
+        await this.GetUser()
+        await this.listenForItems();
     }
 }
 

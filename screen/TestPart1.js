@@ -15,6 +15,8 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Sound from 'react-native-sound';
 import { RadioGroup, RadioButton } from 'react-native-flexi-radio-button'
 import { PagerTabIndicator, IndicatorViewPager, PagerTitleIndicator, PagerDotIndicator } from 'rn-viewpager';
+import ControllAudio from './ControllAudio';
+
 export default class Lesson extends Component {
   static navigationOptions = ({ navigation }) => ({
     title: `${navigation.state.params.name}` + ' Part I',
@@ -34,11 +36,13 @@ export default class Lesson extends Component {
       answer3: undefined,
       answer4: undefined,
       play_on: true,
-      play_off:false,
+      play_off: false,
       da1: false,
       da2: false,
       da3: false,
-      da4: false
+      da4: false,
+      myAnswer: null,
+      userKey: null,
     }
   }
 
@@ -97,7 +101,25 @@ export default class Lesson extends Component {
       da4: false
     })
   }
+  GetUser = async () => {
+    //const value = await AsyncStorage.getItem('user');
+    const UserKey = await AsyncStorage.getItem('userKey');
+    await this.setState({
+      userKey: UserKey
+    })
+  }
   answer(as1, as2, as3, as4, da) {
+    const id = this.props.navigation.state.params.id
+    if (da === this.state.myAnswer) {
+      firebaseApp.database().ref('/User/' + this.state.userKey + '/Process/' + id).update({
+        part1: 100
+      });
+    }
+    else {
+      firebaseApp.database().ref('/User/' + this.state.userKey + '/Process/' + id).update({
+        part1: 0
+      });
+    }
     console.log('dapan:' + da)
     if (da === as1) {
       this.setState({
@@ -165,34 +187,27 @@ export default class Lesson extends Component {
                 source={{ uri: views[r].pic2 }} />
             </View>
             <View>
-              <RadioGroup color='#119f81'>
-                <RadioButton value={'item1'} >
+              <RadioGroup color='#119f81'
+                onSelect={(index, value) => this.setState({ myAnswer: value })}
+              >
+                <RadioButton value={views[r].answer1} >
                   <Text style={[this.state.da1 && styles.da]} >A.{this.state.answer1}</Text>
                 </RadioButton>
-                <RadioButton value={'item2'}>
+                <RadioButton value={views[r].answer2}>
                   <Text style={[this.state.da2 && styles.da]}>B.{this.state.answer2}</Text>
                 </RadioButton>
-                <RadioButton value={'item3'}>
+                <RadioButton value={views[r].answer3}>
                   <Text style={[this.state.da3 && styles.da]}>C.{this.state.answer3}</Text>
                 </RadioButton>
 
-                <RadioButton value={'item4'}>
+                <RadioButton value={views[r].answer4}>
                   <Text style={[this.state.da4 && styles.da]}>D.{this.state.answer4}</Text>
                 </RadioButton>
               </RadioGroup>
             </View>
           </View>
           <View style={{ margin: 5, flexDirection: 'row', justifyContent: 'space-between' }}>
-          {this.state.play_on &&  <TouchableOpacity onPress={() => {audio.play(),this.setState({play_off:true})}}>
-              <Image style={{ marginLeft: 10, height: 50, width: 50 }}
-                source={require('../image/icon_play.png')} />
-          </TouchableOpacity> }
-          {/* ,this.setState({ play_off:false,play_on:true }) */}
-          { this.state.play_off && <TouchableOpacity onPress={() => {audio.pause()}} >
-              <Image style={{ marginLeft: 10, height: 50, width: 50 }}
-                source={require('../image/icon_pause.png')} />
-          </TouchableOpacity> }
-            <Text style={{ fontSize: 18, padding: 12, color: 'white' }}> Picture Description </Text>
+            <ControllAudio audio={audio} des='Picture Description' />
             <TouchableOpacity onPress={() => this.answer(views[r].answer1, views[r].answer2, views[r].answer3, views[r].answer4, views[r].result)}>
               <Image style={{ marginLeft: 40, height: 50, width: 50, padding: 20 }}
                 source={require('../image/icon_rs.png')} />
@@ -206,7 +221,6 @@ export default class Lesson extends Component {
   }
   render() {
     return (
-
       <View style={{
         flex: 1,
         justifyContent: 'center', padding: 5, backgroundColor: '#119f81', elevation: 2
@@ -217,8 +231,9 @@ export default class Lesson extends Component {
       </View>
     );
   }
-  componentDidMount() {
-    this.listenForItems();
+  async componentDidMount() {
+    await this.GetUser();
+    await this.listenForItems();
   }
 }
 

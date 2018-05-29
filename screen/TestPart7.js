@@ -41,31 +41,49 @@ export default class TestPart7 extends Component {
             da11: false,
             da12: false,
             linkHTML: '',
+            myAnswer1: null,
+            myAnswer2: null,
+            myAnswer3: null,
+            myAnswer4: null,
+            myAnswer5: null,
+
         }
     }
-    playTrack(audio) {
-        console.log('play run :' + audio)
-        const track = new Sound(audio, null, (e) => {
-            if (e) {
-                console.log('error loading track:', e)
-            } else {
-                track.play()
-            }
+    GetUser = async () => {
+        //const value = await AsyncStorage.getItem('user');
+        const UserKey = await AsyncStorage.getItem('userKey');
+        await this.setState({
+            userKey: UserKey
         })
     }
     answer(data) {
-        console.log('linkhtml', data.html)
         var da1 = data.result1;
         var da2 = data.result2;
         var da3 = data.result3;
         var da4 = data.result4;
         var da5 = data.result5;
-        this.setState(prevState => {
-            return { linkHTML: data.html }
-        }, () => {
-            console.log('state linkhtml' + this.state.linkHTML)
-        })
-
+        const id = this.props.navigation.state.params.id
+        console.log('myas1,myas2,myas3', this.state.myAnswer1, this.state.myAnswer2, this.state.myAnswer3)
+        console.log('da1,da2,da3', da1, da2, da3)
+        var percent = 0
+        if (da1 === this.state.myAnswer1) {
+            percent = percent + 20
+        }
+        if (da2 === this.state.myAnswer2) {
+            percent = percent + 20
+        }
+        if (da3 === this.state.myAnswer3) {
+            percent = percent + 20
+        }
+        if (da4 === this.state.myAnswer4) {
+            percent = percent + 20
+        }
+        if (da5 === this.state.myAnswer5) {
+            percent = percent + 20
+        }
+        firebaseApp.database().ref('/User/' + this.state.userKey + '/Process/' + id).update({
+            part7: percent
+        });
         if (da1 === data.answer1) {
             this.setState({
                 da1: true
@@ -166,7 +184,7 @@ export default class TestPart7 extends Component {
                 da20: true
             })
         }
-        console.log('data',this.state)
+        console.log('data', this.state)
     }
     getLink(pic) {
         return new Promise((resolve, reject) => {
@@ -246,22 +264,19 @@ export default class TestPart7 extends Component {
                                 <Text style={styles.qs} > {item.question1}</Text>
                             </View>
                             <View>
-                                <RadioGroup color='#119f81'>
-
-                                    <RadioButton value={'item1'} >
+                                <RadioGroup color='#119f81'
+                                    onSelect={(index, value) => this.setState({ myAnswer1: value })}
+                                >
+                                    <RadioButton value={item.answer1} >
                                         <Text style={[this.state.da1 && styles.da]} >A.{item.answer1}</Text>
-
                                     </RadioButton>
-
-                                    <RadioButton value={'item2'}>
+                                    <RadioButton value={item.answer2}>
                                         <Text style={[this.state.da2 && styles.da]}>B.{item.answer2}</Text>
                                     </RadioButton>
-
-                                    <RadioButton value={'item3'}>
+                                    <RadioButton value={item.answer3}>
                                         <Text style={[this.state.da3 && styles.da]}>C.{item.answer3}</Text>
                                     </RadioButton>
-
-                                    <RadioButton value={'item4'}>
+                                    <RadioButton value={item.answer4}>
                                         <Text style={[this.state.da4 && styles.da]}>D.{item.answer4}</Text>
                                     </RadioButton>
                                 </RadioGroup>
@@ -271,18 +286,19 @@ export default class TestPart7 extends Component {
                                 <Text style={styles.qs} > {item.question2}</Text>
                             </View>
                             <View>
-                                <RadioGroup color='#119f81'>
-                                    <RadioButton value={'item1'} >
+                                <RadioGroup color='#119f81'
+                                    onSelect={(index, value) => this.setState({ myAnswer2: value })}
+                                >
+                                    <RadioButton value={item.answer5} >
                                         <Text style={[this.state.da5 && styles.da]} >A.{item.answer5}</Text>
                                     </RadioButton>
-                                    <RadioButton value={'item2'}>
+                                    <RadioButton value={item.answer6}>
                                         <Text style={[this.state.da6 && styles.da]}>B.{item.answer6}</Text>
                                     </RadioButton>
-                                    <RadioButton value={'item3'}>
+                                    <RadioButton value={item.answer7}>
                                         <Text style={[this.state.da7 && styles.da]}>C.{item.answer7}</Text>
                                     </RadioButton>
-
-                                    <RadioButton value={'item4'}>
+                                    <RadioButton value={item.answer8}>
                                         <Text style={[this.state.da8 && styles.da]}>D.{item.answer8}</Text>
                                     </RadioButton>
                                 </RadioGroup >
@@ -291,18 +307,20 @@ export default class TestPart7 extends Component {
                                 <Text style={styles.qs} > {item.question3}</Text>
                             </View>
                             <View>
-                                <RadioGroup color='#119f81'>
-                                    <RadioButton value={'item1'} >
+                                <RadioGroup color='#119f81'
+                                    onSelect={(index, value) => this.setState({ myAnswer3: value })}
+                                >
+                                    <RadioButton value={item.answer9} >
                                         <Text style={[this.state.da9 && styles.da]} >A.{item.answer9}</Text>
                                     </RadioButton>
-                                    <RadioButton value={'item2'}>
+                                    <RadioButton value={item.answer10}>
                                         <Text style={[this.state.da10 && styles.da]}>B.{item.answer10}</Text>
                                     </RadioButton>
-                                    <RadioButton value={'item3'}>
+                                    <RadioButton value={item.answer11}>
                                         <Text style={[this.state.da11 && styles.da]}>C.{item.answer11}</Text>
                                     </RadioButton>
 
-                                    <RadioButton value={'item4'}>
+                                    <RadioButton value={item.answer12}>
                                         <Text style={[this.state.da12 && styles.da]}>D.{item.answer12}</Text>
                                     </RadioButton>
                                 </RadioGroup>
@@ -311,22 +329,19 @@ export default class TestPart7 extends Component {
                                 <Text style={styles.qs} > {item.question4}</Text>
                             </View>
                             <View>
-                                <RadioGroup color='#119f81'>
-
-                                    <RadioButton value={'item1'} >
+                                <RadioGroup color='#119f81'
+                                    onSelect={(index, value) => this.setState({ myAnswer4: value })}
+                                >
+                                    <RadioButton value={item.answer13} >
                                         <Text style={[this.state.da13 && styles.da]} >A.{item.answer13}</Text>
-
                                     </RadioButton>
-
-                                    <RadioButton value={'item2'}>
+                                    <RadioButton value={item.answer14}>
                                         <Text style={[this.state.da14 && styles.da]}>B.{item.answer14}</Text>
                                     </RadioButton>
-
-                                    <RadioButton value={'item3'}>
+                                    <RadioButton value={item.answer15}>
                                         <Text style={[this.state.da15 && styles.da]}>C.{item.answer15}</Text>
                                     </RadioButton>
-
-                                    <RadioButton value={'item4'}>
+                                    <RadioButton value={item.answer16}>
                                         <Text style={[this.state.da16 && styles.da]}>D.{item.answer16}</Text>
                                     </RadioButton>
                                 </RadioGroup>
@@ -336,17 +351,19 @@ export default class TestPart7 extends Component {
                                 <Text style={styles.qs} > {item.question5}</Text>
                             </View>
                             <View>
-                                <RadioGroup color='#119f81'>
-                                    <RadioButton value={'item1'} >
+                                <RadioGroup color='#119f81'
+                                    onSelect={(index, value) => this.setState({ myAnswer5: value })}
+                                >
+                                    <RadioButton value={item.answer17} >
                                         <Text style={[this.state.da17 && styles.da]} >A.{item.answer17}</Text>
                                     </RadioButton>
-                                    <RadioButton value={'item2'}>
+                                    <RadioButton value={item.answer18}>
                                         <Text style={[this.state.da18 && styles.da]}>B.{item.answer18}</Text>
                                     </RadioButton>
-                                    <RadioButton value={'item3'}>
+                                    <RadioButton value={item.answer19}>
                                         <Text style={[this.state.da19 && styles.da]}>C.{item.answer19}</Text>
                                     </RadioButton>
-                                    <RadioButton value={'item4'}>
+                                    <RadioButton value={item.answer20}>
                                         <Text style={[this.state.da20 && styles.da]}>D.{item.answer20}</Text>
                                     </RadioButton>
                                 </RadioGroup >
@@ -354,7 +371,7 @@ export default class TestPart7 extends Component {
                         </ScrollView>
                     </View>
                     <View style={{ margin: 5, flexDirection: 'row', justifyContent: 'space-between', }}>
-                        <Text style={{ fontSize: 18, padding: 12,color:'white'  }}> Reading Comprehension </Text>
+                        <Text style={{ fontSize: 18, padding: 12, color: 'white' }}> Reading Comprehension </Text>
                         <TouchableOpacity onPress={() => this.answer(item)}>
                             <Image style={{ height: 50, width: 50, padding: 20 }}
                                 source={require('../image/icon_rs.png')} />
@@ -364,8 +381,9 @@ export default class TestPart7 extends Component {
             </View>
         );
     }
-    componentDidMount() {
-        this.listenForItems();
+    async componentDidMount() {
+        await this.GetUser()
+        await this.listenForItems();
     }
 }
 

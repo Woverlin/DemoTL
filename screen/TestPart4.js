@@ -15,6 +15,9 @@ import { firebaseApp } from '../Config.js';
 import Sound from 'react-native-sound';
 import { RadioGroup, RadioButton } from 'react-native-flexi-radio-button'
 import { PagerTabIndicator, IndicatorViewPager, PagerTitleIndicator, PagerDotIndicator } from 'rn-viewpager';
+import ControllAudio from './ControllAudio';
+
+
 export default class TestPart4 extends Component {
   static navigationOptions = ({ navigation }) => ({
     title: `${navigation.state.params.name}` + ' Part IV',
@@ -43,6 +46,13 @@ export default class TestPart4 extends Component {
       linkHTML: '',
     }
   }
+  GetUser = async () => {
+    //const value = await AsyncStorage.getItem('user');
+    const UserKey = await AsyncStorage.getItem('userKey');
+    await this.setState({
+      userKey: UserKey
+    })
+  }
   playTrack(audio) {
     console.log('play run :' + audio)
     const track = new Sound(audio, null, (e) => {
@@ -68,6 +78,9 @@ export default class TestPart4 extends Component {
       da5: false,
       da6: false,
       htmlenable: false,
+      myAnswer1: null,
+      myAnswer2: null,
+      myAnswer3: null
 
     })
   }
@@ -79,12 +92,22 @@ export default class TestPart4 extends Component {
     var da1 = data.result1;
     var da2 = data.result2;
     var da3 = data.result3;
-    this.setState(prevState => {
-      return { linkHTML: data.html }
-    }, () => {
-      console.log('state linkhtml' + this.state.linkHTML)
-    })
-
+    console.log('myas1,myas2,myas3', this.state.myAnswer1, this.state.myAnswer2, this.state.myAnswer3)
+    console.log('da1,da2,da3', da1, da2, da3)
+    const id = this.props.navigation.state.params.id
+    var percent = 0
+    if (da1 === this.state.myAnswer1) {
+      percent = percent + 33
+    }
+    if (da2 === this.state.myAnswer2) {
+      percent = percent + 33
+    }
+    if (da3 === this.state.myAnswer3) {
+      percent = percent + 34
+    }
+    firebaseApp.database().ref('/User/' + this.state.userKey + '/Process/' + id).update({
+      part4: percent
+    });
     if (da1 === data.answer1) {
       this.setState({
         da1: true
@@ -160,12 +183,10 @@ export default class TestPart4 extends Component {
   listenForItems() {
     const { params } = this.props.navigation.state;
     firebaseApp.database().ref('/Part4').orderByChild('idLesson').equalTo(params.id).on('child_added', (dataSnapshot) => {
-      console.log(dataSnapshot.val())
       this.getLink(dataSnapshot.val().linkAudio, dataSnapshot.val().stt)
         .then((audio) => {
           this.getLink(dataSnapshot.val().linktalk)
             .then((html) => {
-              console.log('html', html)
               let item = {
                 answer1: dataSnapshot.val().answer1,
                 answer2: dataSnapshot.val().answer2,
@@ -189,115 +210,134 @@ export default class TestPart4 extends Component {
                 html,
               };
               this.setState({
-                items: item
+                items: [...this.state.items, item]
               });
             });
         });
     });
   }
+  renderBaiHoc(item) {
+    let inputRow = [];
+    for (let r = 0; r < item.length; r++) {
+      var audio = new Sound(item[r].audio, null, (e) => { })
+      console.log('audio', audio)
+      return (
+        <View style={{
+          flex: 1,
+          justifyContent: 'center', padding: 5, backgroundColor: '#119f81', elevation: 2
+        }}>
+          <View style={{ flex: 1 }}>
+            {this.state.htmlenable && <View style={styles.view1}>
+              <WebView
+                source={{ uri: item[r].html }}
+                style={{ backgroundColor: 'white' }}
+              />
+            </View>}
+            <View style={{ padding: 2 }} />
+            <View style={styles.view1}>
+              <ScrollView>
+                <View >
+                  <Text style={styles.qs}> {item[r].question1}</Text>
+                </View>
+                <View>
+                  <RadioGroup color='#119f81'
+                    onSelect={(index, value) => this.setState({ myAnswer1: value })}
+                  >
+                    <RadioButton value={item[r].answer1} >
+                      <Text style={[this.state.da1 && styles.da]} >A.{item[r].answer1}</Text>
+                    </RadioButton>
+                    <RadioButton value={item[r].answer2}>
+                      <Text style={[this.state.da2 && styles.da]}>B.{item[r].answer2}</Text>
+                    </RadioButton>
+                    <RadioButton value={item[r].answer3}>
+                      <Text style={[this.state.da3 && styles.da]}>C.{item[r].answer3}</Text>
+                    </RadioButton>
+                    <RadioButton value={item[r].answer4}>
+                      <Text style={[this.state.da4 && styles.da]}>D.{item[r].answer4}</Text>
+                    </RadioButton>
+                  </RadioGroup>
+                </View>
+                <View >
+                  <Text style={styles.qs} > {item[r].question2}</Text>
+                </View>
+                <View>
+                  <RadioGroup color='#119f81'
+                    onSelect={(index, value) => this.setState({ myAnswer2: value })}
+                  >
+                    <RadioButton value={item[r].answer5} >
+                      <Text style={[this.state.da5 && styles.da]} >A.{item[r].answer5}</Text>
+                    </RadioButton>
+                    <RadioButton value={item[r].answer6}>
+                      <Text style={[this.state.da6 && styles.da]}>B.{item[r].answer6}</Text>
+                    </RadioButton>
+                    <RadioButton value={item[r].answer7}>
+                      <Text style={[this.state.da7 && styles.da]}>C.{item[r].answer7}</Text>
+                    </RadioButton>
+
+                    <RadioButton value={item[r].answer8}>
+                      <Text style={[this.state.da8 && styles.da]}>D.{item[r].answer8}</Text>
+                    </RadioButton>
+                  </RadioGroup >
+                </View>
+                <View >
+                  <Text> {item[r].question3}</Text>
+                </View>
+                <View>
+                  <RadioGroup color='#119f81'
+                    onSelect={(index, value) => this.setState({ myAnswer3: value })}
+                  >
+                    <RadioButton value={item[r].answer9} >
+                      <Text style={[this.state.da9 && styles.da]} >A.{item[r].answer9}</Text>
+                    </RadioButton>
+                    <RadioButton value={item[r].answer10}>
+                      <Text style={[this.state.da10 && styles.da]}>B.{item[r].answer10}</Text>
+                    </RadioButton>
+                    <RadioButton value={item[r].answer11}>
+                      <Text style={[this.state.da11 && styles.da]}>C.{item[r].answer11}</Text>
+                    </RadioButton>
+
+                    <RadioButton value={item[r].answer12}>
+                      <Text style={[this.state.da12 && styles.da]}>D.{item[r].answer12}</Text>
+                    </RadioButton>
+                  </RadioGroup>
+                </View>
+              </ScrollView>
+            </View>
+            <View style={{ margin: 5, flexDirection: 'row', justifyContent: 'space-between', }}>
+              {/* <TouchableOpacity onPress={() => this.playTrack(item[r].audio)}>
+              <Image style={{ marginLeft: 10, height: 50, width: 50 }}
+                source={require('../image/icon_play.png')} />
+            </TouchableOpacity>
+            <Text style={{ fontSize: 18, padding: 12, color: 'white' }}> Short Conversations </Text>
+            */}
+              <ControllAudio audio={audio} des='Short Conversations' />
+              <TouchableOpacity onPress={() => this.answer(item[r])}>
+                <Image style={{ height: 50, width: 50, padding: 20 }}
+                  source={require('../image/icon_rs.png')} />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+
+      );
+    }
+  }
+
   render() {
-    const item = this.state.items;
-    console.log('item', this.state.items)
     return (
       <View style={{
         flex: 1,
         justifyContent: 'center', padding: 5, backgroundColor: '#119f81', elevation: 2
       }}>
-        <View style={{ flex: 1 }}>
-          {this.state.htmlenable && <View style={styles.view1}>
-            <WebView
-              source={{ uri: item.html }}
-              style={{ backgroundColor: 'white' }}
-            />
-          </View>}
-          <View style={{ padding: 2 }} />
-          <View style={styles.view1}>
-            <ScrollView>
-              <View >
-                <Text style={styles.qs}> {item.question1}</Text>
-              </View>
-              <View>
-                <RadioGroup color='#119f81'>
-
-                  <RadioButton value={'item1'} >
-                    <Text style={[this.state.da1 && styles.da]} >A.{item.answer1}</Text>
-
-                  </RadioButton>
-
-                  <RadioButton value={'item2'}>
-                    <Text style={[this.state.da2 && styles.da]}>B.{item.answer2}</Text>
-                  </RadioButton>
-
-                  <RadioButton value={'item3'}>
-                    <Text style={[this.state.da3 && styles.da]}>C.{item.answer3}</Text>
-                  </RadioButton>
-
-                  <RadioButton value={'item4'}>
-                    <Text style={[this.state.da4 && styles.da]}>D.{item.answer4}</Text>
-                  </RadioButton>
-                </RadioGroup>
-              </View>
-
-              <View >
-                <Text style={styles.qs} > {item.question2}</Text>
-              </View>
-              <View>
-                <RadioGroup color='#119f81'>
-                  <RadioButton value={'item1'} >
-                    <Text style={[this.state.da5 && styles.da]} >A.{item.answer5}</Text>
-                  </RadioButton>
-                  <RadioButton value={'item2'}>
-                    <Text style={[this.state.da6 && styles.da]}>B.{item.answer6}</Text>
-                  </RadioButton>
-                  <RadioButton value={'item3'}>
-                    <Text style={[this.state.da7 && styles.da]}>C.{item.answer7}</Text>
-                  </RadioButton>
-
-                  <RadioButton value={'item4'}>
-                    <Text style={[this.state.da8 && styles.da]}>D.{item.answer8}</Text>
-                  </RadioButton>
-                </RadioGroup >
-              </View>
-              <View >
-                <Text style={styles.qs} > {item.question3}</Text>
-              </View>
-              <View>
-                <RadioGroup color='#119f81'>
-                  <RadioButton value={'item1'} >
-                    <Text style={[this.state.da9 && styles.da]} >A.{item.answer9}</Text>
-                  </RadioButton>
-                  <RadioButton value={'item2'}>
-                    <Text style={[this.state.da10 && styles.da]}>B.{item.answer10}</Text>
-                  </RadioButton>
-                  <RadioButton value={'item3'}>
-                    <Text style={[this.state.da11 && styles.da]}>C.{item.answer11}</Text>
-                  </RadioButton>
-
-                  <RadioButton value={'item4'}>
-                    <Text style={[this.state.da12 && styles.da]}>D.{item.answer12}</Text>
-                  </RadioButton>
-                </RadioGroup>
-              </View>
-            </ScrollView>
-          </View>
-          <View style={{ margin: 5, flexDirection: 'row', justifyContent: 'space-between', }}>
-            <TouchableOpacity onPress={() => this.playTrack(item.audio)}>
-              <Image style={{ marginLeft: 10, height: 50, width: 50 }}
-                source={require('../image/icon_play.png')} />
-            </TouchableOpacity>
-            <Text style={{ fontSize: 18, padding: 12,color:'white'  }}> Short Conversations </Text>
-            <TouchableOpacity onPress={() => this.answer(item)}>
-              <Image style={{ height: 50, width: 50, padding: 20 }}
-                source={require('../image/icon_rs.png')} />
-            </TouchableOpacity>
-          </View>
-        </View>
+        <IndicatorViewPager style={{ flex: 1 }} onPageScroll={this.onPageScroll.bind(this)} >
+          {this.renderBaiHoc(this.state.items)}
+        </IndicatorViewPager>
       </View>
-
     );
   }
-  componentDidMount() {
-    this.listenForItems();
+  async componentWillMount() {
+    await this.GetUser()
+    await this.listenForItems();
   }
 }
 
@@ -313,8 +353,8 @@ const styles = StyleSheet.create({
   da: {
     color: 'red'
   },
-  qs:{
-    fontSize:15,
-    color:'black',
+  qs: {
+    fontSize: 15,
+    color: 'black',
   }
 })

@@ -50,7 +50,7 @@ export default class Home extends Component {
     async listenForItems() {
         await this.GetUser();
         let arr = [];
-        await firebaseApp.database().ref('/User/' + this.state.userKey + '/Topic').on('child_added', (dataSnapshot) => {
+        await firebaseApp.database().ref('/User/' + this.state.userKey + '/TopicSaved').on('child_added', (dataSnapshot) => {
             console.log('data:', dataSnapshot.val());
             let item = {
                 name: dataSnapshot.val().name,
@@ -82,7 +82,7 @@ export default class Home extends Component {
         }.bind(this), 1000)
     }
     delete(stt) {
-        firebaseApp.database().ref('/User/' + this.state.userKey + '/Topic/' + stt).remove();
+        firebaseApp.database().ref('/User/' + this.state.userKey + '/TopicSaved/' + stt).remove();
         let temp = this.state.items.filter((x) => x.stt !== stt);
         this.setState({ items: temp });
     }

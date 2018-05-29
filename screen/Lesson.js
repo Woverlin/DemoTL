@@ -109,13 +109,13 @@ export default class Lesson extends Component {
     var vitri = this.indexOf(item.key)
     console.log('vitri', vitri)
     if (item.mark === true) {
-      firebaseApp.database().ref('/User/' + this.state.userKey + '/Vocab/' + item.stt).remove();
+      firebaseApp.database().ref('/User/' + this.state.userKey + '/VocabSaved/' + item.stt).remove();
       let temp = [...this.state.items];
       temp[vitri] = { ...temp[vitri], mark: false };
       this.setState({ items: temp });
     }
     if (item.mark === false) {
-      firebaseApp.database().ref('/User/' + this.state.userKey + '/Vocab/' + item.stt).update({
+      firebaseApp.database().ref('/User/' + this.state.userKey + '/VocabSaved/' + item.stt).update({
         stt: item.stt,
         name: item.name,
         mean: item.mean,

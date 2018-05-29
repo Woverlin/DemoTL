@@ -19,7 +19,7 @@ export default class Lst_LuyenNghe extends Component {
   });
   constructor(props) {
     super(props);
-    this.listenForItems = this.listenForItems.bind(this);
+    //this.listenForItems = this.listenForItems.bind(this);
     this.getPic = this.getPic.bind(this);
     this.items = [];
     this.state = {
@@ -40,26 +40,26 @@ export default class Lst_LuyenNghe extends Component {
     });
   }
 
-  listenForItems() {
-    console.log('name:' + `${this.props.navigation.state.params.name}`)
-    console.log('id:' + `${this.props.navigation.state.params.id}`)
-    firebaseApp.database().ref('/ChuDe').on('child_added', (dataSnapshot) => {
-      // console.log('napshot', dataSnapshot);
-      this.getPic(dataSnapshot.val().linkImg, dataSnapshot.val().stt)
-        .then((pic2) => {
-          let item = {
-            name: dataSnapshot.val().word,
-            picture: dataSnapshot.val().linkImg,
-            stt: dataSnapshot.val().id,
-            key: dataSnapshot.key,
-            pic2,
-          };
-          this.setState({
-            items: [...this.state.items, item]
-          });
-        });
-    });
-  }
+  // listenForItems() {
+  //   console.log('name:' + `${this.props.navigation.state.params.name}`)
+  //   console.log('id:' + `${this.props.navigation.state.params.id}`)
+  //   firebaseApp.database().ref('/ChuDe').on('child_added', (dataSnapshot) => {
+  //     // console.log('napshot', dataSnapshot);
+  //     this.getPic(dataSnapshot.val().linkImg, dataSnapshot.val().stt)
+  //       .then((pic2) => {
+  //         let item = {
+  //           name: dataSnapshot.val().word,
+  //           picture: dataSnapshot.val().linkImg,
+  //           stt: dataSnapshot.val().id,
+  //           key: dataSnapshot.key,
+  //           pic2,
+  //         };
+  //         this.setState({
+  //           items: [...this.state.items, item]
+  //         });
+  //       });
+  //   });
+  // }
 
   test1() {
     this.checkAlert.alert("Mẹo",
@@ -160,7 +160,7 @@ export default class Lst_LuyenNghe extends Component {
     const { items } = this.state;
     //console.log('Items Items', items);
     return (
-        <View style={{ flex: 1, justifyContent: 'center', padding: 20, backgroundColor: '#119f81' }}>
+      <View style={{ flex: 1, justifyContent: 'center', padding: 20, backgroundColor: '#119f81' }}>
         <ScrollView style={{ flex: 1 }}>
           <View style={{ marginBottom: 10, backgroundColor: '#119f81' }}>
             <CheckAlert //tuy chinh cho alert 
@@ -261,13 +261,13 @@ export default class Lst_LuyenNghe extends Component {
             </TouchableOpacity>
 
           </View>
-          </ScrollView>
-        </View>
-      
+        </ScrollView>
+      </View>
+
     );
   }
   componentDidMount() {
-    this.listenForItems();
+    //this.listenForItems();
   }
 }
 

@@ -60,13 +60,13 @@ export default class Home extends Component {
     var key = item.stt - 1;
     //console.log('vitri', key)
     if (item.mark === true) {
-      firebaseApp.database().ref('/User/' + this.state.userKey + '/Topic/' + item.stt).remove();
+      firebaseApp.database().ref('/User/' + this.state.userKey + '/TopicSaved/' + item.stt).remove();
       let temp = [...this.state.items];
       temp[key] = { ...temp[key], mark: false };
       this.setState({ items: temp });
     }
     if (item.mark === false) {
-      firebaseApp.database().ref('/User/' + this.state.userKey + '/Topic/' + item.stt).update({
+      firebaseApp.database().ref('/User/' + this.state.userKey + '/TopicSaved/' + item.stt).update({
         id: item.stt,
         name: item.name,
         mean: item.mean,

@@ -57,7 +57,7 @@ export default class VocabSave extends Component {
   async listenForItems() {
     await this.GetUser();
     let arr = [];
-    await firebaseApp.database().ref('/User/' + this.state.userKey + '/Vocab').on('child_added', (dataSnapshot) => {
+    await firebaseApp.database().ref('/User/' + this.state.userKey + '/VocabSaved').on('child_added', (dataSnapshot) => {
       let item = {
         stt: dataSnapshot.val().stt,
         name: dataSnapshot.val().name,
@@ -98,7 +98,7 @@ export default class VocabSave extends Component {
     }
   }
   delete(key, stt) {
-    firebaseApp.database().ref('/User/' + this.state.userKey + '/Vocab/' + stt).remove();
+    firebaseApp.database().ref('/User/' + this.state.userKey + '/VocabSaved/' + stt).remove();
     let temp = this.state.items.filter((x) => x.stt !== stt);
     this.setState({ items: temp });
   }

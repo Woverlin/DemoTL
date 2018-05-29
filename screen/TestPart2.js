@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { firebaseApp } from '../Config.js';
 //import Swiper from 'react-native-swiper';
-
+import ControllAudio from './ControllAudio';
 import Sound from 'react-native-sound';
 import { RadioGroup, RadioButton } from 'react-native-flexi-radio-button'
 import { PagerTabIndicator, IndicatorViewPager, PagerTitleIndicator, PagerDotIndicator } from 'rn-viewpager';
@@ -55,7 +55,7 @@ export default class Lesson extends Component {
   onPageScroll() {
     return this.setState({
       answer1: undefined,
-      answer2: undefined, 
+      answer2: undefined,
       answer3: undefined,
       answer4: undefined,
       answer5: undefined,
@@ -68,11 +68,30 @@ export default class Lesson extends Component {
       da4: false,
       da5: false,
       da6: false,
+      myAnswer1: null,
+      myAnswer2: null
 
     })
   }
+  GetUser = async () => {
+    //const value = await AsyncStorage.getItem('user');
+    const UserKey = await AsyncStorage.getItem('userKey');
+    await this.setState({
+      userKey: UserKey
+    })
+  }
   answer(as1, as2, as3, as4, as5, as6, da1, da2, q1, q2) {
-    console.log('dapan:' + da1, da2)
+    const id = this.props.navigation.state.params.id
+    var percent = 0
+    if (da1 === this.state.myAnswer1) {
+      percent = percent + 50
+    }
+    if (da2 === this.state.myAnswer2) {
+      percent = percent + 50
+    }
+    firebaseApp.database().ref('/User/' + this.state.userKey + '/Process/' + id).update({
+      part2: percent
+    });
     if (da1 === as1) {
       this.setState({
         da1: true
@@ -150,11 +169,12 @@ export default class Lesson extends Component {
     });
   }
   renderBaiHoc(data) {
-    //console.log(data);
+    console.log(data);
     let views = data;
     let inputRow = [];
     for (let r = 0; r < views.length; r++) {
-      //this.bookmark(views[r].mark,r)
+      var audio = new Sound(views[r].audio, null, (e) => { })
+      console.log('audio', views[r].audio)
       inputRow.push(
         <View style={{ flex: 1 }}>
           <View style={styles.view1}>
@@ -162,17 +182,19 @@ export default class Lesson extends Component {
               <Text style={styles.qs}> {this.state.qs1}</Text>
             </View>
             <View>
-              <RadioGroup color='#119f81'>
-                <RadioButton value={'item1'} >
+              <RadioGroup color='#119f81'
+                onSelect={(index, value) => this.setState({ myAnswer1: value })}
+              >
+                <RadioButton value={views[r].answer1} >
                   <Text style={[this.state.da1 && styles.da]} >A.{this.state.answer1}</Text>
 
                 </RadioButton>
 
-                <RadioButton value={'item2'}>
+                <RadioButton value={views[r].answer2}>
                   <Text style={[this.state.da2 && styles.da]}>B.{this.state.answer2}</Text>
                 </RadioButton>
 
-                <RadioButton value={'item3'}>
+                <RadioButton value={views[r].answer3}>
                   <Text style={[this.state.da3 && styles.da]}>C.{this.state.answer3}</Text>
                 </RadioButton>
               </RadioGroup>
@@ -182,25 +204,23 @@ export default class Lesson extends Component {
               <Text style={styles.qs} > {this.state.qs2}</Text>
             </View>
             <View>
-              <RadioGroup color='#119f81'>
-                <RadioButton value={'item1'} >
+              <RadioGroup color='#119f81'
+                onSelect={(index, value) => this.setState({ myAnswer2: value })}
+              >
+                <RadioButton value={views[r].answer4} >
                   <Text style={[this.state.da4 && styles.da]} >A.{this.state.answer4}</Text>
                 </RadioButton>
-                <RadioButton value={'item2'}>
+                <RadioButton value={views[r].answer5}>
                   <Text style={[this.state.da5 && styles.da]}>B.{this.state.answer5}</Text>
                 </RadioButton>
-                <RadioButton value={'item3'}>
+                <RadioButton value={views[r].answer6}>
                   <Text style={[this.state.da6 && styles.da]}>C.{this.state.answer6}</Text>
                 </RadioButton>
               </RadioGroup>
             </View>
           </View>
           <View style={{ margin: 5, flexDirection: 'row', justifyContent: 'space-between', }}>
-            <TouchableOpacity onPress={() => this.playTrack(views[r].audio)}>
-              <Image style={{ marginLeft: 10, height: 50, width: 50 }}
-                source={require('../image/icon_play.png')} />
-            </TouchableOpacity>
-            <Text style={{ fontSize: 18, padding: 12,color:'white' }}> Question and Response</Text>
+            <ControllAudio audio={audio} des='Question and Response' />
             <TouchableOpacity onPress={() => this.answer(views[r].answer1, views[r].answer2, views[r].answer3,
               views[r].answer4, views[r].answer5, views[r].answer6, views[r].result2, views[r].result3, views[r].question2, views[r].question3)}>
               <Image style={{ height: 50, width: 50, padding: 20 }}
@@ -215,7 +235,6 @@ export default class Lesson extends Component {
   }
   render() {
     return (
-
       <View style={{
         flex: 1,
         justifyContent: 'center', padding: 5, backgroundColor: '#119f81', elevation: 2
@@ -226,8 +245,9 @@ export default class Lesson extends Component {
       </View>
     );
   }
-  componentDidMount() {
-    this.listenForItems();
+  async componentDidMount() {
+    await this.GetUser();
+    await this.listenForItems();
   }
 }
 
@@ -243,8 +263,8 @@ const styles = StyleSheet.create({
   da: {
     color: 'red'
   },
-  qs:{
-    fontSize:15,
-    color:'black'
+  qs: {
+    fontSize: 15,
+    color: 'black'
   }
 })

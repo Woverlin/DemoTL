@@ -46,6 +46,7 @@ import ListTestAll from './screen/ListTestALL'
 import TestAllPart1 from './screen/TestAllPart1'
 import TestAllPart7 from './screen/TestAllPart7'
 import TestAllPart2 from './screen/TestAllPart2'
+import Chart from './screen/Chart'
 const Stack_Home = StackNavigator({
     Home: {
         screen: Home2,
@@ -149,7 +150,7 @@ const Stack_VocabSaved = StackNavigator({    //tao header cho từ vựng đã l
 })
 const Stack_Game = StackNavigator({    //tao header cho Game
     Home: {
-        screen: ListTestAll,
+        screen: Game,
         navigationOptions: ({ navigation }) => ({
             title: 'Luyện tập',
             headerLeft: (
@@ -165,17 +166,17 @@ const Stack_Game = StackNavigator({    //tao header cho Game
 
         }),
     },
-    TestAllPart1: { screen: TestAllPart1 },
-    TestAllPart7: { screen: TestAllPart7 },
-    TestAllPart2: { screen: TestAllPart2 },
-    // Lst_LuyenNghe: { screen: Lst_LuyenNghe },
-    // Game_LuyenNghe: { screen: Game_LuyenNghe },
-    // Game_NghiaTV: { screen: Game_NghiaTV },
-    // Lst_NghiaTV: { screen: Lst_NghiaTV },
+    // TestAllPart1: { screen: TestAllPart1 },
+    // TestAllPart7: { screen: TestAllPart7 },
+    // TestAllPart2: { screen: TestAllPart2 },
+    Lst_LuyenNghe: { screen: Lst_LuyenNghe },
+    Game_LuyenNghe: { screen: Game_LuyenNghe },
+    Game_NghiaTV: { screen: Game_NghiaTV },
+    Lst_NghiaTV: { screen: Lst_NghiaTV },
 
-    // Lst_LuyenViet: { screen: Lst_LuyenViet },
-    // Game_NghiaTA: { screen: Game_NghiaTA },
-    // Lst_NghiaTA: { screen: Lst_NghiaTA },
+    Lst_LuyenViet: { screen: Lst_LuyenViet },
+    Game_NghiaTA: { screen: Game_NghiaTA },
+    Lst_NghiaTA: { screen: Lst_NghiaTA },
 })
 const Stack_Search = StackNavigator({    //tao header cho tìm kiếm
     Home: {
@@ -217,6 +218,26 @@ const Stack_Support = StackNavigator({    //tao header cho tìm kiếm
         }),
     },
 })
+const Stack_Chart = StackNavigator({    //tao header cho tìm kiếm
+    Home: {
+        screen: Chart,
+        navigationOptions: ({ navigation }) => ({
+            title: 'Biểu đồ thi ',
+            // tintColor: '#1e5fc6',
+            headerLeft: (
+                <TouchableOpacity onPress={() => navigation.navigate('DrawerOpen')}>
+                    <Image
+                        style={{ margin: 5, height: 25, width: 25, tintColor: '#26a8ff' }}
+                        source={require('./image/icon_menu.png')}
+                    />
+                </TouchableOpacity>
+            ),
+            headerStyle: { backgroundColor: "#4C3E54", paddingLeft: 10, paddingRight: 10 },
+            headerTitleStyle: { color: "white", }
+
+        }),
+    },
+})
 const drawernav = DrawerNavigator({
 
     Home1: { screen: Stack_Home },
@@ -225,7 +246,8 @@ const drawernav = DrawerNavigator({
     VocabSave1: { screen: Stack_VocabSaved },
     Search1: { screen: Stack_Search },
     TopicSaved1: { screen: Stack_TopicSaved },
-    Support1: { screen: Stack_Support }
+    Support1: { screen: Stack_Support },
+    Chart: { screen: Stack_Chart }
 }, {
         initialRouteName: 'Home1',
         drawerWidth: 230,
