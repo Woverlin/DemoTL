@@ -222,7 +222,7 @@ const Stack_Chart = StackNavigator({    //tao header cho tìm kiếm
     Home: {
         screen: Chart,
         navigationOptions: ({ navigation }) => ({
-            title: 'Biểu đồ thi ',
+            title: 'Biểu đồ thi các Part ',
             // tintColor: '#1e5fc6',
             headerLeft: (
                 <TouchableOpacity onPress={() => navigation.navigate('DrawerOpen')}>

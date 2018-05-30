@@ -43,16 +43,6 @@ export default class TestPart5 extends Component {
             userKey: UserKey
         })
     }
-    playTrack(audio) {
-        console.log('play run :' + audio)
-        const track = new Sound(audio, null, (e) => {
-            if (e) {
-                console.log('error loading track:', e)
-            } else {
-                track.play()
-            }
-        })
-    }
     onPageScroll() {
         return this.setState({
             da1: false,
@@ -68,9 +58,11 @@ export default class TestPart5 extends Component {
         const id = this.props.navigation.state.params.id
         var tile = 100 / (this.state.items.length);
         if (item.result === this.state.myAnswer1) {
-            percent1 = percent1 + tile;
-            console.log('so diem1', percent1)
+            percent1 = percent1 + tile
+            percent1.toPrecision(4)
+            //console.log('so diem1', percent1)
         }
+
         this.setState({
             percent: percent1
         }, () => {
