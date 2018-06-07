@@ -89,7 +89,7 @@ export default class Home extends Component {
   async GetListTopicSave() {
     await this.GetUser()
     await console.log('109-getlisttopicSave run', this.state.userKey)
-    await firebaseApp.database().ref('User/' + this.state.userKey + '/Topic').on('child_added', (dataSnapshot) => {
+    await firebaseApp.database().ref('User/' + this.state.userKey + '/TopicSaved').on('child_added', (dataSnapshot) => {
       console.log(dataSnapshot.key)
       let topic = { key: dataSnapshot.key };
       this.setState({

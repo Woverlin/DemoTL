@@ -12,14 +12,15 @@ import {
 import { firebaseApp } from '../Config.js';
 import CheckAlert from "react-native-awesome-alert"
 import Icon from 'react-native-vector-icons/Ionicons';
-export default class Lst_LuyenNghe extends Component {
+export default class Lst_Test extends Component {
   static navigationOptions = ({ navigation }) => ({
     title: 'Test ' + `${navigation.state.params.name}`,
     headerTintColor: '#119f81',
   });
   constructor(props) {
     super(props);
-    //this.listenForItems = this.listenForItems.bind(this);
+    this.listenForItems = this.listenForItems.bind(this);
+    this.GetUser = this.GetUser.bind(this)
     this.getPic = this.getPic.bind(this);
     this.items = [];
     this.state = {
@@ -39,28 +40,39 @@ export default class Lst_LuyenNghe extends Component {
       });
     });
   }
-
-  // listenForItems() {
-  //   console.log('name:' + `${this.props.navigation.state.params.name}`)
-  //   console.log('id:' + `${this.props.navigation.state.params.id}`)
-  //   firebaseApp.database().ref('/ChuDe').on('child_added', (dataSnapshot) => {
-  //     // console.log('napshot', dataSnapshot);
-  //     this.getPic(dataSnapshot.val().linkImg, dataSnapshot.val().stt)
-  //       .then((pic2) => {
-  //         let item = {
-  //           name: dataSnapshot.val().word,
-  //           picture: dataSnapshot.val().linkImg,
-  //           stt: dataSnapshot.val().id,
-  //           key: dataSnapshot.key,
-  //           pic2,
-  //         };
-  //         this.setState({
-  //           items: [...this.state.items, item]
-  //         });
-  //       });
-  //   });
-  // }
-
+  GetUser = async () => {
+    //const value = await AsyncStorage.getItem('user');
+    const UserKey = await AsyncStorage.getItem('userKey');
+    await this.setState({
+      userKey: UserKey
+    }, () => { console.log('userkey', this.state.userKey) })
+  }
+  async listenForItems() {
+    console.log('runnnnn')
+    const { params } = this.props.navigation.state;
+    firebaseApp.database().ref('/User/' + this.state.userKey + '/Process/' + params.id).once('value', (dataSnapshot) => {
+      console.log('datasnap', dataSnapshot.val())
+      if (dataSnapshot.val() === null) {
+        let item = {
+          part1: 0,
+          part2: 0,
+          part3: 0,
+          part4: 0,
+          part5: 0,
+          part6: 0,
+          part7: 0,
+        }
+        this.setState({
+          items: item
+        }, () => { console.log('item', this.state.items) });
+      }
+      else {
+        this.setState({
+          items: dataSnapshot.val()
+        }, () => { console.log('item', this.state.items) });
+      }
+    });
+  }
   test1() {
     this.checkAlert.alert("Mẹo",
       <View style={{ paddingLeft: 5, paddingRight: 5 }}>
@@ -154,6 +166,15 @@ export default class Lst_LuyenNghe extends Component {
         { text: "Để sau", onPress: () => console.log("Cancel touch") }
       ])
   }
+  async componentDidMount() {
+    await this.GetUser()
+    await this.listenForItems()
+  }
+  getPercent(item) {
+    if (item === undefined)
+      return '0%'
+    else return item.toFixed(0) + '%'
+  }
   render() {
     const { navigate } = this.props.navigation;
     const { params } = this.props.navigation.state;
@@ -193,71 +214,78 @@ export default class Lst_LuyenNghe extends Component {
             <TouchableOpacity
               style={styles.lesson}
               onPress={this.test1.bind(this)}>
-              <Image style={{ width: 25, height: 25, marginLeft: 10, tintColor: '#ff0000' }}
-                source={require('../image/num1.png')} />
+              {/* <Image style={{ width: 25, height: 25, marginLeft: 10, tintColor: '#ff0000' }}
+                source={require('../image/num1.png')} /> */}
               <Text style={styles.lsname}>
-                Test Part 1 - Photographs
+                Part 1 - Photographs
             </Text>
+              <Text style={styles.lsname}> {this.getPercent(items.part1)}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.lesson}
               onPress={this.test2.bind(this)}>
-              <Image style={{ width: 25, height: 25, marginLeft: 10, tintColor: '#ff0000' }}
-                source={require('../image/num2.png')} />
+              {/* <Image style={{ width: 25, height: 25, marginLeft: 10, tintColor: '#ff0000' }}
+                source={require('../image/num2.png')} /> */}
               <Text style={styles.lsname}>
-                Test Part 2 - Question and Response
+                Part 2 - Question and Response
             </Text>
+              <Text style={styles.lsname}> {this.getPercent(items.part2)}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.lesson}
               onPress={this.test3.bind(this)}>
-              <Image style={{ width: 25, height: 25, marginLeft: 10, tintColor: '#ff0000' }}
-                source={require('../image/num3.png')} />
+              {/* <Image style={{ width: 25, height: 25, marginLeft: 10, tintColor: '#ff0000' }}
+                source={require('../image/num3.png')} /> */}
               <Text style={styles.lsname}>
-                Test Part 3 - Short Conversations
+                Part 3 - Short Conversations
             </Text>
+              <Text style={styles.lsname}> {this.getPercent(items.part3)}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.lesson}
               onPress={this.test4.bind(this)}>
-              <Image style={{ width: 25, height: 25, marginLeft: 10, tintColor: '#ff0000' }}
-                source={require('../image/num4.png')} />
+              {/* <Image style={{ width: 25, height: 25, marginLeft: 10, tintColor: '#ff0000' }}
+                source={require('../image/num4.png')} /> */}
               <Text style={styles.lsname}>
-                Test Part 4 - Short Talks
+                Part 4 - Short Talks
             </Text>
+              <Text style={styles.lsname}> {this.getPercent(items.part4)}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.lesson}
               onPress={this.test5.bind(this)}>
-              <Image style={{ width: 25, height: 25, marginLeft: 10, tintColor: '#ff0000' }}
-                source={require('../image/num5.png')} />
+              {/* <Image style={{ width: 25, height: 25, marginLeft: 10, tintColor: '#ff0000' }}
+                source={require('../image/num5.png')} /> */}
               <Text style={styles.lsname}>
-                Test Part 5 - Incomplete Sentences
+                Part 5 - Incomplete Sentences
             </Text>
+              <Text style={styles.lsname}> {this.getPercent(items.part5)}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.lesson}
               onPress={this.test6.bind(this)}>
-              <Image style={{ width: 25, height: 25, marginLeft: 10, tintColor: '#ff0000' }}
-                source={require('../image/num6.png')} />
+              {/* <Image style={{ width: 25, height: 25, marginLeft: 10, tintColor: '#ff0000' }}
+                source={require('../image/num6.png')} /> */}
               <Text style={styles.lsname}>
-                Test Part 6 - Text Completetion
+                Part 6 - Text Completetion
             </Text>
+              <Text style={styles.lsname}> {this.getPercent(items.part6)}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.lesson}
               onPress={this.test7.bind(this)}>
-              <Image style={{ width: 25, height: 25, marginLeft: 10, tintColor: '#ff0000' }}
-                source={require('../image/num7.png')} />
+              {/* <Image style={{ width: 25, height: 25, marginLeft: 10, tintColor: '#ff0000' }}
+                source={require('../image/num7.png')} /> */}
               <Text style={styles.lsname}>
-                Test Part 7 - Reading Comprehension
+                Part 7 - Reading Comprehension
             </Text>
+              <Text style={styles.lsname}> {this.getPercent(items.part7)}</Text>
             </TouchableOpacity>
 
           </View>
@@ -265,9 +293,6 @@ export default class Lst_LuyenNghe extends Component {
       </View>
 
     );
-  }
-  componentDidMount() {
-    //this.listenForItems();
   }
 }
 
@@ -280,6 +305,7 @@ const styles = StyleSheet.create({
     height: 25,
   },
   lesson: {
+    justifyContent: 'space-between',
     elevation: 5,
     alignItems: 'center',
     flexDirection: 'row',

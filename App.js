@@ -14,7 +14,7 @@ import Lesson from './screen/Lesson';
 import Home2 from './screen/Home2';
 import SlieMenu from './screen/SlideMenu'
 
-import Test from './screen/Test';
+//import Test2 from './screen/Test2';
 
 import Lst_Test from './screen/Lst_Test';
 import Game from './screen/Game';
@@ -42,10 +42,6 @@ import Support from './screen/Support'
 import TopicSaved from './screen/TopicSave'
 import Login from './screen/Login'
 import Register from './screen/Register'
-import ListTestAll from './screen/ListTestALL'
-import TestAllPart1 from './screen/TestAllPart1'
-import TestAllPart7 from './screen/TestAllPart7'
-import TestAllPart2 from './screen/TestAllPart2'
 import Chart from './screen/Chart'
 const Stack_Home = StackNavigator({
     Home: {

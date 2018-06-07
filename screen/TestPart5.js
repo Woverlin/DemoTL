@@ -34,6 +34,8 @@ export default class TestPart5 extends Component {
             da4: false,
             myAnser: null,
             percent: 0,
+            myAnswer: [],
+            isCheck: false,
         }
     }
     GetUser = async () => {
@@ -50,6 +52,17 @@ export default class TestPart5 extends Component {
             da3: false,
             da4: false,
         })
+    }
+    answer1() {
+        const items = this.state.items
+        const myAnswer = this.state.myAnswer
+        var isCheck = true
+        items[1].isCheck = true
+        this.setState({
+            items,
+            isCheck: true
+        }, console.log(this.state.items))
+
     }
     answer(item) {
         var percent1 = this.state.percent;
@@ -118,6 +131,47 @@ export default class TestPart5 extends Component {
             });
         });
     }
+    setColor(index, answer) {
+        console.log(`index ${index} :answer ${answer}`)
+        const items = this.state.items
+        if (this.state.isCheck === true) {
+            if (items[index].result === answer) {
+                console.log(`dap an dung ${index}: ${answer}`)
+                return {
+                    color: 'red'
+                }
+            }
+        }
+    }
+    renderItem = ({ item, index }) => {
+        const myAnswer = this.state.myAnswer;
+        console.log(myAnswer)
+        return (
+            <View style={styles.view1}>
+                <Text style={{ fontSize: 15, color: 'black', padding: 5 }}> {item.question}</Text>
+                <RadioGroup color='#119f81'
+                    onSelect={(ind, value) => {
+                        console.log('myanswer', value)
+                        myAnswer[index] = value;
+                        this.setState({ myAnswer: myAnswer }, console.log(myAnswer))
+                    }}
+                >
+                    <RadioButton value={item.answer1} >
+                        <Text style={this.setColor(index, item.answer1)} >A.{item.answer1}</Text>
+                    </RadioButton>
+                    <RadioButton value={item.answer2}>
+                        <Text style={this.setColor(index, item.answer2)}>B.{item.answer2}</Text>
+                    </RadioButton>
+                    <RadioButton value={item.answer3}>
+                        <Text style={this.setColor(index, item.answer3)}>C.{item.answer3}</Text>
+                    </RadioButton>
+                    <RadioButton value={item.answer4}>
+                        <Text style={this.setColor(index, item.answer4)}>D.{item.answer4}</Text>
+                    </RadioButton>
+                </RadioGroup>
+            </View>
+        );
+    }
     renderBaiHoc(data) {
         //console.log('dataaaaaaaaaa', data);
         let views = data;
@@ -163,7 +217,6 @@ export default class TestPart5 extends Component {
         await this.listenForItems();
     }
 
-
     render() {
         console.log('item', this.state.items)
         const { items } = this.state;
@@ -176,6 +229,21 @@ export default class TestPart5 extends Component {
                     onPageScroll={this.onPageScroll.bind(this)} >
                     {this.renderBaiHoc(this.state.items)}
                 </IndicatorViewPager>
+                {/* <FlatList
+                    style={styles.container}
+                    data={items}
+                    renderItem={this.renderItem}
+                /> */}
+                {/* <ScollView>
+                   {this.renderBaiHoc(this.state.items)}
+                </ScollView>
+                <View style={{ margin: 5, flexDirection: 'row', justifyContent: 'space-between', }}>
+                    <Text style={{ fontSize: 18, padding: 12, color: 'white' }}> Incomplete Sentences </Text>
+                    <TouchableOpacity onPress={() => this.answer1()}>
+                        <Image style={{ height: 50, width: 50, padding: 20 }}
+                            source={require('../image/icon_rs.png')} />
+                    </TouchableOpacity>
+                </View> */}
             </View>
         );
     }

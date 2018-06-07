@@ -137,20 +137,21 @@ export default class Lesson extends Component {
   async GetListVocabSave() {
     await this.GetUser()
     await console.log('get userKey', this.state.userKey)
-    await firebaseApp.database().ref('User/' + this.state.userKey + '/Vocab').on('child_added', (dataSnapshot) => {
+    await firebaseApp.database().ref('User/' + this.state.userKey + '/VocabSaved').on('child_added', (dataSnapshot) => {
+      //console.log(dataSnapshot.val())
       let item = {
-        stt: dataSnapshot.id,
-        name: dataSnapshot.word,
-        mean: dataSnapshot.mean,
-        example: dataSnapshot.example,
-        explainMean: dataSnapshot.explainMean,
-        explainExample: dataSnapshot.explainExample,
-        type: dataSnapshot.type,
-        pronounce: dataSnapshot.pronounce,
-        parent: dataSnapshot.parent,
-        mark: dataSnapshot.vocabmark,
-        pic: dataSnapshot.pic,
-        audio: dataSnapshot.audio,
+        stt: dataSnapshot.val().stt,
+        name: dataSnapshot.val().name,
+        mean: dataSnapshot.val().mean,
+        example: dataSnapshot.val().example,
+        explainMean: dataSnapshot.val().explainMean,
+        explainExample: dataSnapshot.val().explainExample,
+        type: dataSnapshot.val().type,
+        pronounce: dataSnapshot.val().pronounce,
+        parent: dataSnapshot.val().parent,
+        mark: dataSnapshot.val().vocabmark,
+        pic: dataSnapshot.val().pic,
+        audio: dataSnapshot.val().audio,
       };
       this.setState({
         listVocabSave: [...this.state.listVocabSave, item]
@@ -163,7 +164,7 @@ export default class Lesson extends Component {
     const listVocabSave = this.state.listVocabSave
     console.log('list saved', listVocabSave)
     for (var i = 0; i < listVocabSave.length; i++) {
-      if (id == listVocabSave[i].key) {
+      if (id === listVocabSave[i].stt) {
         mark = true
         console.log('mark 108', mark)
         return mark
