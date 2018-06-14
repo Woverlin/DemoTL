@@ -173,12 +173,13 @@ export default class Lesson extends Component {
         });
     });
   }
+
   renderBaiHoc(data) {
     //console.log(data);
     let views = data;
     let inputRow = [];
     for (let r = 0; r < views.length; r++) {
-      var audio = new Sound(views[r].audio, null, (e) => { })
+      const audio = new Sound(views[r].audio, null, (e) => { })
       inputRow.push(
         <View style={{ flex: 1 }}>
           <View style={styles.view1}>

@@ -9,6 +9,9 @@ class ControllAudio extends Component {
             play_off: false,
         }
     }
+    componentWillUnmount() {
+        this.props.audio.stop()
+    }
     render() {
         return (
             <View style={{ flexDirection: 'row' }}>

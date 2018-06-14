@@ -43,6 +43,8 @@ import TopicSaved from './screen/TopicSave'
 import Login from './screen/Login'
 import Register from './screen/Register'
 import Chart from './screen/Chart'
+import Lst_Trick from './screen/Lst_Trick'
+import LogoScreen from './screen/LogoScreen'
 const Stack_Home = StackNavigator({
     Home: {
         screen: Home2,
@@ -214,6 +216,27 @@ const Stack_Support = StackNavigator({    //tao header cho tìm kiếm
         }),
     },
 })
+const Stack_Trick = StackNavigator({    //tao header cho Trick
+    Home: {
+        screen: Lst_Trick,
+        navigationOptions: ({ navigation }) => ({
+            title: 'Mẹo thi Toeic',
+            // tintColor: '#1e5fc6',
+            headerLeft: (
+                <TouchableOpacity onPress={() => navigation.navigate('DrawerOpen')}>
+                    <Image
+                        style={{ margin: 5, height: 25, width: 25, tintColor: '#26a8ff' }}
+                        source={require('./image/icon_menu.png')}
+                    />
+                </TouchableOpacity>
+            ),
+            headerStyle: { backgroundColor: "#4C3E54", paddingLeft: 10, paddingRight: 10 },
+            headerTitleStyle: { color: "white", }
+
+        }),
+    },
+    Grammar_View: { screen: Grammar_View }
+})
 const Stack_Chart = StackNavigator({    //tao header cho tìm kiếm
     Home: {
         screen: Chart,
@@ -243,7 +266,8 @@ const drawernav = DrawerNavigator({
     Search1: { screen: Stack_Search },
     TopicSaved1: { screen: Stack_TopicSaved },
     Support1: { screen: Stack_Support },
-    Chart: { screen: Stack_Chart }
+    Chart: { screen: Stack_Chart },
+    Trick1: { screen: Stack_Trick }
 }, {
         initialRouteName: 'Home1',
         drawerWidth: 230,
@@ -251,6 +275,7 @@ const drawernav = DrawerNavigator({
     });
 
 const Stack_Login = StackNavigator({
+    LogoScreen: { screen: LogoScreen },
     Login: { screen: Login },
     Register: { screen: Register },
     drawernav: { screen: drawernav }
