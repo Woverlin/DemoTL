@@ -124,7 +124,6 @@ export default class Home extends Component {
               pic2,
               mark
             };
-            //console.log('data', item)
             arr.push(item);
             return arr
             //array
@@ -133,12 +132,10 @@ export default class Home extends Component {
             //sdung ham then -> sap xep bo setState
           })
           .then(result => {
-            if (result.length === 50) {
-              result = result.sort(this.compare);
-              this.setState({
-                items: result
-              })
-            }
+            result = result.sort(this.compare);
+            this.setState({
+              items: result
+            })
           });
       })
     })

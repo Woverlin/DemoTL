@@ -44,35 +44,79 @@ export default class App extends React.Component {
             userKey: UserKey
         }, () => { console.log('userkey', this.state.userKey) })
     }
-    async listenForItem() {
-        const { params } = this.props.navigation.state;
-        firebaseApp.database().ref('/User/' + this.state.userKey + '/Process').on('child_added', (dataSnapshot) => {
-            console.log('datasnap', dataSnapshot.val())
-            let item = {
-                part1: dataSnapshot.val().part1,
-                part2: dataSnapshot.val().part2,
-                part3: dataSnapshot.val().part3,
-                part4: dataSnapshot.val().part4,
-                part5: dataSnapshot.val().part5,
-                part6: dataSnapshot.val().part6,
-                part7: dataSnapshot.val().part7
-            };
-            this.setState({
-                items: [...this.state.items, item]
-            }, () => console.log('items', this.state.items));
-        });
-    }
     sum(item) {
-        console.log('itemsum', item)
+        //console.log('itemsum', item)
         var sum = 0
         for (var i = 0; i < item.length; i++) {
             sum = sum + item[i]
         }
         return sum
     }
+    listenForItem2() {
+        console.log('run listenForItem')
+        const { params } = this.props.navigation.state;
+        //const parts = [];
+        return promise1 = new Promise((resolve, reject) => {
+            firebaseApp.database().ref('/User/' + this.state.userKey + '/Process').on('child_added', (dataSnapshot) => {
+                console.log('datasnap', dataSnapshot.val())
+                let item = {
+                    part1: dataSnapshot.val().part1,
+                    part2: dataSnapshot.val().part2,
+                    part3: dataSnapshot.val().part3,
+                    part4: dataSnapshot.val().part4,
+                    part5: dataSnapshot.val().part5,
+                    part6: dataSnapshot.val().part6,
+                    part7: dataSnapshot.val().part7,
+                }
+                this.setState({
+                    items: [...this.state.items, item]
+                }, () => console.log('items 123', this.state.items));
+            })
+        });
+        // return Promise.all([promise1])
+        //     .then(values => {
+        //         let dataSnapshot = values[0];
+        //         console.log("abc---------------------------");
+        //         let item = {
+        //             part1: dataSnapshot.val().part1,
+        //             part2: dataSnapshot.val().part2,
+        //             part3: dataSnapshot.val().part3,
+        //             part4: dataSnapshot.val().part4,
+        //             part5: dataSnapshot.val().part5,
+        //             part6: dataSnapshot.val().part6,
+        //             part7: dataSnapshot.val().part7,
+        //         }
+        //         this.setState({
+        //             items: [...this.state.items, item]
+        //         }, () => console.log('items 123', this.state.items));
+        //     })
+    }
+    async listenForItem() {
+        console.log('run listenForItem')
+        const { params } = this.props.navigation.state;
+        await firebaseApp.database().ref('/User/' + this.state.userKey + '/Process').once('value', dataSnapshot => {
+            console.log('data 72', dataSnapshot.val())
+            const items = [];
+            const dataSnapshotValues = dataSnapshot.val();
+            for (key in dataSnapshotValues) {
+                items.push(dataSnapshotValues[key]);
+            }
+            console.log("items-----", items);
+            this.setState({
+                items: [...items] //dataSnapshot.val()
+            },
+                //console.log('items', this.state.items)
+            );
+        })
 
+        //console.log('datasnap', )
+
+    }
     async processData() {
-        console.log('abc', this.state.items)
+        const { items } = this.state
+        console.log('run processdata')
+        // if (this.state.items.length > 0) {
+        console.log('abc', items)
         var part1 = []
         var part2 = []
         var part3 = []
@@ -80,14 +124,7 @@ export default class App extends React.Component {
         var part5 = []
         var part6 = []
         var part7 = []
-        var percentPart1 = 0
-        var percentPart2 = 0
-        var percentPart3 = 0
-        var percentPart4 = 0
-        var percentPart5 = 0
-        var percentPart6 = 0
-        var percentPart7 = 0
-        const { items } = this.state
+
         for (var i = 0; i < items.length; i++) {
             if (items[i].part1 !== undefined)
                 part1.push(items[i].part1)
@@ -104,9 +141,6 @@ export default class App extends React.Component {
             if (items[i].part7 !== undefined)
                 part7.push(items[i].part7)
         }
-        percentPart1 = this.sum(part1) / part1.length
-        console.log('percent1', percentPart1)
-
         const data = [
             { part: "1", percent: this.sum(part1) / part1.length },
             { part: "2", percent: this.sum(part2) / part2.length },
@@ -120,21 +154,31 @@ export default class App extends React.Component {
         this.setState({
             data: data,
             isLoading: false
-        })
+        }, console.log('isloading', this.state.isLoading))
+        //}
     }
-    async componentDidMount() {
+    // async componentDidMount() {
+    //     console.log('didmout')
+
+    //     //await this.processData()
+
+    // }
+    async componentWillMount() {
+        console.log('willmount')
         await this.GetUser()
-        await this.listenForItem()
-        await this.processData()
+        this.listenForItem().then(_ => this.processData());
+
     }
     renderChart() {
-
-        if (this.state.isLoading)
+        console.log('state isloading', this.state.isLoading)
+        if (this.state.isLoading) {
+            console.log('loading....')
             return (
                 <View>
                     <Text style={{ flex: 1, fontSize: 20, justifyContent: 'center', alignItems: 'center', color: '#ff0000' }}> Đang phân tích dữ liệu...</Text>
                 </View >
             );
+        }
         else {
             const { data } = this.state
             console.log('processdata', data)
@@ -217,6 +261,8 @@ export default class App extends React.Component {
         }
     }
     render() {
+        console.log('rendering')
+        console.log('state.items', this.state.items)
         return (
             <View style={styles.container}>
                 {this.renderChart()}
